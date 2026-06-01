@@ -15,9 +15,14 @@ BQ_PROJECT  = "meli-bi-data"
 API_BASE    = "https://fpr-cross.melioffice.com/attachments"
 API_HEADERS = {"X-Scope": "fraud", "X-External-System": "FPR_REPATRIATION"}
 USER_PROMPT = (
-    "Analizá el documento. Indicá: 1) Si es una denuncia policial (sí/no). "
-    "2) Si es denuncia, resumí el motivo y el tipo de estafa. "
-    "3) Listá montos, fechas e instituciones involucradas."
+    "Analizá el documento y respondé en formato JSON con estos campos:\n"
+    "- es_denuncia_policial: true/false\n"
+    "- tipo_fraude: string con el tipo de estafa en pocas palabras (ej: 'vishing', 'phishing whatsapp', 'préstamo fraudulento', etc.). "
+    "Si no es denuncia, dejá vacío.\n"
+    "- resumen: una oración resumiendo el motivo\n"
+    "- montos: lista de montos mencionados\n"
+    "- instituciones: lista de instituciones involucradas\n"
+    "Respondé SOLO con el JSON, sin texto adicional."
 )
 
 OUTPUT_DIR = Path(__file__).parent.parent / "output"
@@ -157,21 +162,30 @@ def preguntar_adjunto(uuid):
 
 # ── Clasificación ─────────────────────────────────────────────────────────────
 
+def parsear_respuesta_ia(texto):
+    """Intenta parsear el JSON que devuelve la IA."""
+    try:
+        # A veces la IA envuelve el JSON en ```json ... ```
+        match = re.search(r'\{.*\}', texto, re.DOTALL)
+        if match:
+            return json.loads(match.group())
+    except Exception:
+        pass
+    return {}
+
 def es_denuncia(texto):
+    parsed = parsear_respuesta_ia(texto)
+    if parsed:
+        return bool(parsed.get("es_denuncia_policial", False))
+    # Fallback a keywords si la IA no devolvió JSON
     t = texto.lower()
     return any(kw in t for kw in KW_DENUNCIA)
 
 def clasificar_fraude(texto):
-    t = texto.lower()
-    scores = {}
-    for cat, kws in CATEGORIAS.items():
-        hits = [(kw, t.find(kw)) for kw in kws if kw in t]
-        if hits:
-            primer_idx = min(idx for _, idx in hits)
-            scores[cat] = (len(hits), -primer_idx)
-    if not scores:
-        return "No clasificado"
-    return max(scores, key=lambda c: scores[c])
+    parsed = parsear_respuesta_ia(texto)
+    if parsed:
+        return parsed.get("tipo_fraude", "No clasificado") or "No clasificado"
+    return "No clasificado"
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
