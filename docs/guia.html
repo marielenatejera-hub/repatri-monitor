@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Guía — Monitor Clasificador de Estafas</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+           background: #f5f5f5; color: #333; padding: 40px 24px; }
+    .wrap { max-width: 900px; margin: 0 auto; }
+
+    /* Header */
+    .header { border-bottom: 3px solid #FFE600; padding-bottom: 20px; margin-bottom: 36px; }
+    .header h1 { font-size: 28px; font-weight: 800; color: #333; }
+    .header .sub { color: #666; font-size: 14px; margin-top: 6px; }
+    .header .meta { font-size: 12px; color: #aaa; margin-top: 4px; }
+
+    /* TOC */
+    .toc { background: #fff; border-radius: 12px; padding: 24px 28px;
+           box-shadow: 0 1px 6px rgba(0,0,0,0.07); margin-bottom: 36px; }
+    .toc h2 { font-size: 13px; font-weight: 700; text-transform: uppercase;
+               letter-spacing: .08em; color: #999; margin-bottom: 14px; }
+    .toc ol { padding-left: 20px; }
+    .toc li { margin-bottom: 6px; }
+    .toc a { color: #3483FA; text-decoration: none; font-size: 14px; }
+    .toc a:hover { text-decoration: underline; }
+
+    /* Secciones */
+    .section { background: #fff; border-radius: 12px; padding: 28px 32px;
+                box-shadow: 0 1px 6px rgba(0,0,0,0.07); margin-bottom: 24px; }
+    .section h2 { font-size: 20px; font-weight: 800; color: #333; margin-bottom: 6px;
+                   display: flex; align-items: center; gap: 10px; }
+    .section .num { background: #3483FA; color: #fff; border-radius: 50%;
+                    width: 28px; height: 28px; display: flex; align-items: center;
+                    justify-content: center; font-size: 13px; font-weight: 800;
+                    flex-shrink: 0; }
+    .section p { font-size: 14px; color: #555; line-height: 1.7; margin-top: 12px; }
+    .section ul, .section ol { padding-left: 22px; margin-top: 10px; }
+    .section li { font-size: 14px; color: #555; line-height: 1.7; margin-bottom: 4px; }
+
+    /* Subsección */
+    h3 { font-size: 15px; font-weight: 700; color: #333; margin: 20px 0 8px; }
+    h4 { font-size: 13px; font-weight: 700; color: #666; margin: 14px 0 6px;
+          text-transform: uppercase; letter-spacing: .05em; }
+
+    /* Código */
+    pre { background: #1e1e2e; color: #cdd6f4; border-radius: 8px; padding: 16px 20px;
+           font-size: 13px; line-height: 1.6; overflow-x: auto; margin: 12px 0;
+           white-space: pre-wrap; word-break: break-all; }
+    code { background: #f0f0f0; color: #c0392b; border-radius: 4px;
+            padding: 2px 6px; font-size: 13px; }
+
+    /* Alertas */
+    .alert { border-radius: 8px; padding: 14px 18px; margin: 14px 0;
+              font-size: 13px; line-height: 1.6; word-break: break-word; overflow-wrap: break-word; }
+    .alert-yellow { background: #fffbea; border-left: 4px solid #FFE600; color: #7a6200; }
+    .alert-blue   { background: #eff6ff; border-left: 4px solid #3483FA; color: #1e40af; }
+    .alert-green  { background: #f0fdf4; border-left: 4px solid #00A650; color: #166534; }
+    .alert-red    { background: #fff1f2; border-left: 4px solid #F23D4F; color: #9f1239; }
+
+    /* Tabla */
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+    th { background: #f7f9fc; text-align: left; padding: 10px 14px;
+          font-size: 11px; text-transform: uppercase; letter-spacing: .05em;
+          color: #999; border-bottom: 2px solid #eee; }
+    td { padding: 10px 14px; border-bottom: 1px solid #f0f0f0; color: #444; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+
+    /* Badge */
+    .badge { display: inline-block; border-radius: 20px; padding: 3px 10px;
+              font-size: 11px; font-weight: 700; }
+    .badge-blue   { background: #eff6ff; color: #3483FA; }
+    .badge-green  { background: #f0fdf4; color: #00A650; }
+    .badge-orange { background: #fff7ed; color: #FF7733; }
+    .badge-red    { background: #fff1f2; color: #F23D4F; }
+
+    /* Step */
+    .step { display: flex; gap: 14px; margin-bottom: 16px; }
+    .step-num { background: #FFE600; color: #333; border-radius: 50%;
+                 width: 26px; height: 26px; display: flex; align-items: center;
+                 justify-content: center; font-size: 12px; font-weight: 800;
+                 flex-shrink: 0; margin-top: 2px; }
+    .step-body { flex: 1; }
+    .step-body strong { font-size: 14px; display: block; margin-bottom: 4px; }
+    .step-body p, .step-body pre { margin-top: 6px; }
+
+    /* Footer */
+    .footer { text-align: center; font-size: 12px; color: #aaa; margin-top: 40px; padding-top: 20px;
+               border-top: 1px solid #eee; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>Monitor Clasificador de Estafas</h1>
+    <div class="sub">Guía completa de configuración, uso y mantenimiento</div>
+    <div class="meta">Última actualización: Junio 2026</div>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <h2>Contenido</h2>
+    <ol>
+      <li><a href="#overview">¿Qué hace este monitor?</a></li>
+      <li><a href="#arquitectura">Arquitectura del sistema</a></li>
+      <li><a href="#requisitos">Requisitos previos</a></li>
+      <li><a href="#configuracion">Configuración inicial paso a paso</a></li>
+      <li><a href="#query">Query de BigQuery</a></li>
+      <li><a href="#api">API de Attachments</a></li>
+      <li><a href="#clasificacion">Clasificación de fraude</a></li>
+      <li><a href="#output">Outputs: CSV y reporte HTML</a></li>
+      <li><a href="#automatizacion">Automatización (cron)</a></li>
+      <li><a href="#alertas">Alertas por mail</a></li>
+      <li><a href="#errores">Qué hacer si falla</a></li>
+      <li><a href="#github">Estructura del repositorio</a></li>
+    </ol>
+  </div>
+
+  <!-- 1. Overview -->
+  <div class="section" id="overview">
+    <h2><span class="num">1</span> ¿Qué hace este monitor?</h2>
+    <p>El monitor analiza automáticamente los casos de repatriación para detectar si existe una denuncia policial adjunta y clasificar el tipo de estafa involucrado.</p>
+    <p>El flujo completo es:</p>
+    <ol style="margin-top:12px">
+      <li><strong>BigQuery</strong> — obtiene los REPATRI_CASE_ID de las últimas 3 semanas</li>
+      <li><strong>API de Attachments</strong> — busca si cada caso tiene archivos adjuntos</li>
+      <li><strong>Ask-to-File (IA)</strong> — analiza el contenido de cada adjunto</li>
+      <li><strong>Clasificación</strong> — detecta si es denuncia policial y el tipo de fraude</li>
+      <li><strong>Export CSV + HTML</strong> — genera los resultados</li>
+      <li><strong>GitHub</strong> — sube todo automáticamente</li>
+    </ol>
+    <div class="alert alert-blue" style="margin-top:16px">
+      📅 Se ejecuta automáticamente todos los <strong>martes a las 10am</strong>, siempre que la Mac esté encendida y con VPN activa.
+
+    </div>
+  </div>
+
+  <!-- 2. Arquitectura -->
+  <div class="section" id="arquitectura">
+    <h2><span class="num">2</span> Arquitectura del sistema</h2>
+    <table>
+      <thead><tr><th>Componente</th><th>Tecnología</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td>Scheduler</td><td>cron (Mac)</td><td>Dispara el script cada martes 10am</td></tr>
+        <tr><td>Script principal</td><td>Python 3.13</td><td><code>src/monitor.py</code> — orquesta todo el flujo</td></tr>
+        <tr><td>Runner</td><td>Bash</td><td><code>run.sh</code> — verifica VPN, corre Python, pushea a GitHub</td></tr>
+        <tr><td>Fuente de datos</td><td>BigQuery</td><td><code>meli-bi-data.WHOWNER.LK_FPR_REPATRI_CASE</code></td></tr>
+        <tr><td>API de adjuntos</td><td>REST (VPN)</td><td><code>fpr-cross.melioffice.com/attachments</code></td></tr>
+        <tr><td>Análisis IA</td><td>Ask-to-File</td><td>Analiza PDFs e imágenes de los adjuntos</td></tr>
+        <tr><td>Almacenamiento</td><td>GitHub</td><td>CSV + HTML en carpeta <code>output/</code></td></tr>
+        <tr><td>Alertas</td><td>sendmail</td><td>Mail a <code>marielena.tejera@mercadolibre.com</code> si falla</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3. Requisitos -->
+  <div class="section" id="requisitos">
+    <h2><span class="num">3</span> Requisitos previos</h2>
+
+    <h3>Software</h3>
+    <table>
+      <thead><tr><th>Requisito</th><th>Verificar con</th><th>Instalar si no está</th></tr></thead>
+      <tbody>
+        <tr><td>Python 3.10+</td><td><code>python3 --version</code></td><td><a href="https://python.org" style="color:#3483FA">python.org</a></td></tr>
+        <tr><td>Git</td><td><code>git --version</code></td><td>Viene con Xcode Command Line Tools</td></tr>
+        <tr><td>gcloud CLI</td><td><code>gcloud auth list</code></td><td>Instalado por Meli</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Librerías Python</h3>
+    <pre>pip3 install google-cloud-bigquery gspread google-auth requests</pre>
+
+    <h3>Permisos en Meli</h3>
+    <ul>
+      <li>Access group <code>attachments_prod_external_read</code> — para buscar y descargar adjuntos</li>
+      <li>Access group <code>attachments_prod_external_ask_to_file_write</code> — para usar Ask-to-File</li>
+      <li>Acceso a <code>meli-bi-data.WHOWNER.LK_FPR_REPATRI_CASE</code> en BigQuery</li>
+      <li>Permiso en GitHub para el repo <code>marielenatejera-hub/repatri-monitor</code> (solicitar via <a href="https://shield.adminml.com" style="color:#3483FA">shield.adminml.com</a>)</li>
+    </ul>
+
+    <h3>Credenciales</h3>
+    <pre># Autenticación BigQuery y Google Sheets
+gcloud auth application-default login --scopes=https://www.googleapis.com/auth/spreadsheets,https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/cloud-platform
+
+# Configurar proyecto de quota
+gcloud auth application-default set-quota-project meli-bi-data</pre>
+  </div>
+
+  <!-- 4. Configuración -->
+  <div class="section" id="configuracion">
+    <h2><span class="num">4</span> Configuración inicial paso a paso</h2>
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <strong>Clonar el repositorio</strong>
+        <pre>cd ~/Documents
+git clone https://github.com/marielenatejera-hub/repatri-monitor.git
+cd repatri-monitor</pre>
+        <p>Cuando pida usuario: <code>marielenatejera-hub</code>. Cuando pida contraseña: usar un Personal Access Token de GitHub (generarlo en github.com → Settings → Developer settings → Tokens classic → repo).</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <strong>Instalar dependencias</strong>
+        <pre>pip3 install google-cloud-bigquery gspread google-auth requests</pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <strong>Autenticar BigQuery y Google</strong>
+        <pre>gcloud auth application-default login --scopes=https://www.googleapis.com/auth/spreadsheets,https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/cloud-platform
+gcloud auth application-default set-quota-project meli-bi-data</pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <strong>Configurar el token de GitHub para push automático</strong>
+        <pre>git remote set-url origin https://TU_USUARIO:TU_TOKEN@github.com/TU_USUARIO/repatri-monitor.git</pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <strong>Configurar el cron (martes 10am)</strong>
+        <pre>(crontab -l 2>/dev/null; echo "0 10 * * 2 /bin/bash ~/Documents/repatri-monitor/run.sh") | crontab -</pre>
+        <p>Verificar: <code>crontab -l</code></p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <strong>Agregar tu mail al script de alertas</strong>
+        <p>En <code>run.sh</code>, línea 5, reemplazar con tu email:</p>
+        <pre>MAIL_TO="tu.email@mercadolibre.com"</pre>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">7</div>
+      <div class="step-body">
+        <strong>Probar manualmente</strong>
+        <pre>bash ~/Documents/repatri-monitor/run.sh</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Query BQ -->
+  <div class="section" id="query">
+    <h2><span class="num">5</span> Query de BigQuery</h2>
+    <p>La query obtiene los casos de repatriación de las últimas 3 semanas completas (lunes a domingo). La ventana se calcula automáticamente en cada ejecución.</p>
+
+    <pre>SELECT DISTINCT
+  a.REPATRI_CASE_ID,
+  a.SITE,
+  a.CREATED_AT_DATETIME,
+  EXTRACT(MONTH FROM a.CREATED_AT_DATETIME) AS MES,
+  a.CASE_RESULT_REASON,
+  inv.CUST_ID        AS CUST_CUST_ID,
+  txn.TRANSACTION_ID AS PAY_PAYMENT_ID,
+  txn.AMOUNT         AS MONTO_ARS,
+  txn.PRODUCT_TYPE   AS PRODUCT_TYPE,
+  txn.PRODUCT_METHOD AS PRODUCT_METHOD,
+  txn.ORIGIN_INSTITUTION AS BANCO_ORIGEN
+FROM `meli-bi-data.WHOWNER.LK_FPR_REPATRI_CASE` a
+CROSS JOIN UNNEST(INVOLVED_CUSTS)         AS inv
+CROSS JOIN UNNEST(CONTESTED_TRANSACTIONS) AS txn
+WHERE a.CREATED_AT_DATETIME >= DATETIME(
+        DATE_SUB(DATE_TRUNC(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), WEEK(MONDAY)), INTERVAL 3 WEEK)
+      )
+  AND a.CREATED_AT_DATETIME &lt;  DATETIME(
+        DATE_ADD(DATE_TRUNC(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), WEEK(MONDAY)), INTERVAL 1 WEEK)
+      )
+  AND a.FLOW_TYPE       = 'REFUND'
+  AND a.CURRENT_STATUS  = 'CLOSED'
+  AND a.SITE            = 'MLA'
+  AND txn.PRODUCT_TYPE   = 'bank_transfer'
+  AND txn.PRODUCT_METHOD = 'cvu'</pre>
+
+    <h3>Campos clave</h3>
+    <table>
+      <thead><tr><th>Campo</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>REPATRI_CASE_ID</code></td><td>ID del caso — se usa como <code>externalId</code> en la API</td></tr>
+        <tr><td><code>MONTO_ARS</code></td><td>Monto de la transacción en ARS</td></tr>
+        <tr><td><code>BANCO_ORIGEN</code></td><td>Institución de donde provienen los fondos</td></tr>
+        <tr><td><code>PRODUCT_METHOD</code></td><td>Filtrado por <code>cvu</code> — transferencias a billeteras virtuales</td></tr>
+      </tbody>
+    </table>
+
+    <div class="alert alert-yellow">
+      ⚠️ La tabla usa <code>CROSS JOIN UNNEST</code> en dos campos anidados (<code>INVOLVED_CUSTS</code> y <code>CONTESTED_TRANSACTIONS</code>). El <code>SELECT DISTINCT</code> es necesario para evitar duplicados de REPATRI_CASE_ID.
+    </div>
+  </div>
+
+  <!-- 6. API -->
+  <div class="section" id="api">
+    <h2><span class="num">6</span> API de Attachments</h2>
+    <p>Se usan dos endpoints. La autenticación es automática por VPN corporativa — no se necesita token.</p>
+
+    <h3>Headers obligatorios en todas las llamadas</h3>
+    <pre>X-Scope: fraud
+X-External-System: FPR_REPATRIATION</pre>
+
+    <h3>Paso 1 — Buscar adjuntos de un caso (Search)</h3>
+    <pre>GET https://fpr-cross.melioffice.com/attachments/v2/files/search/{REPATRI_CASE_ID}</pre>
+    <p>Devuelve un array con los adjuntos del caso. Si devuelve <code>[]</code>, el caso no tiene adjuntos. El campo <code>uuid</code> de cada adjunto se usa en el siguiente paso.</p>
+
+    <h3>Paso 2 — Analizar adjunto con IA (Ask-to-File)</h3>
+    <pre>POST https://fpr-cross.melioffice.com/attachments/v2/files/ask
+
+{
+  "user_prompt": "Analizá el documento...",
+  "effort": "HIGH",
+  "files": [{ "source": "FPR_ATTACHMENTS", "reference": "UUID_DEL_ADJUNTO" }]
+}</pre>
+
+    <div class="alert alert-blue">
+      ℹ️ Este endpoint llama a un modelo de IA — puede tardar hasta 60 segundos. El script usa timeout de 180s y reintenta hasta 3 veces con backoff exponencial en caso de error 429 o 5xx.
+    </div>
+
+    <h3>Access Groups requeridos</h3>
+    <table>
+      <thead><tr><th>Access Group</th><th>Endpoint</th></tr></thead>
+      <tbody>
+        <tr><td><code>attachments_prod_external_read</code></td><td>GET search + GET download</td></tr>
+        <tr><td><code>attachments_prod_external_ask_to_file_write</code></td><td>POST ask</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 7. Clasificación -->
+  <div class="section" id="clasificacion">
+    <h2><span class="num">7</span> Clasificación de fraude</h2>
+    <p>El script le pide a la IA que responda en formato JSON estructurado, lo que permite detectar tipos de fraude de forma dinámica — sin categorías fijas predefinidas.</p>
+
+    <h3>Prompt utilizado</h3>
+    <pre>"Analizá el documento y respondé en formato JSON con estos campos:
+- es_denuncia_policial: true/false
+- tipo_fraude: string con el tipo de estafa en pocas palabras
+- resumen: una oración resumiendo el motivo
+- montos: lista de montos mencionados
+- instituciones: lista de instituciones involucradas
+Respondé SOLO con el JSON, sin texto adicional."</pre>
+
+    <h3>Categorías identificadas (abril 2026)</h3>
+    <table>
+      <thead><tr><th>Tipo</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-blue">📞 Llamada entrante</span></td><td>Estafador llama haciéndose pasar por banco o empresa</td></tr>
+        <tr><td><span class="badge badge-blue">🔍 Búsqueda activa</span></td><td>Víctima busca contacto en Google y llega a un estafador</td></tr>
+        <tr><td><span class="badge badge-orange">📲 Acceso remoto</span></td><td>Instalan app (AnyDesk, Ultra VNC) para tomar control del dispositivo</td></tr>
+        <tr><td><span class="badge badge-red">💳 Préstamo fraudulento</span></td><td>Sacan préstamo a nombre de la víctima sin consentimiento</td></tr>
+        <tr><td><span class="badge badge-green">📱 Redes sociales</span></td><td>Publicidad o perfil falso en Facebook/Instagram</td></tr>
+        <tr><td><span class="badge badge-blue">👤 Cuento del tío</span></td><td>Alguien se hace pasar por familiar/amigo por WhatsApp</td></tr>
+      </tbody>
+    </table>
+
+    <div class="alert alert-green">
+      ✅ Al usar clasificación dinámica con IA, el monitor puede detectar tipos de fraude nuevos automáticamente sin necesidad de actualizar el código.
+    </div>
+  </div>
+
+  <!-- 8. Output -->
+  <div class="section" id="output">
+    <h2><span class="num">8</span> Outputs: CSV y reporte HTML</h2>
+
+    <h3>CSV — <code>output/repatri_monitor_YYYYMMDD.csv</code></h3>
+    <table>
+      <thead><tr><th>Columna</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>repatri_case_id</code></td><td>ID del caso de repatriación</td></tr>
+        <tr><td><code>site</code></td><td>Sitio del caso</td></tr>
+        <tr><td><code>created_at</code></td><td>Fecha de creación del caso</td></tr>
+        <tr><td><code>monto_ars</code></td><td>Monto de la transacción en ARS</td></tr>
+        <tr><td><code>banco_origen</code></td><td>Banco emisor de los fondos</td></tr>
+        <tr><td><code>tiene_adjunto</code></td><td>SI / NO</td></tr>
+        <tr><td><code>tiene_denuncia</code></td><td>SI / NO</td></tr>
+        <tr><td><code>tipo_fraude</code></td><td>Clasificación del tipo de estafa</td></tr>
+        <tr><td><code>ai_response</code></td><td>Respuesta completa de la IA</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Reporte HTML — <code>output/reporte.html</code></h3>
+    <p>Se genera automáticamente al final de cada corrida e incluye:</p>
+    <ul>
+      <li>4 KPIs: casos totales, con adjunto, denuncias policiales, total reclamado en USD</li>
+      <li>Gráfico de barras: casos por tipo de fraude ordenados por cantidad</li>
+      <li>Gráfico de barras: bancos emisores más frecuentes en denuncias</li>
+      <li>Tipo de cambio oficial actualizado automáticamente (fuente: dolarapi.com / BCRA)</li>
+    </ul>
+  </div>
+
+  <!-- 9. Automatización -->
+  <div class="section" id="automatizacion">
+    <h2><span class="num">9</span> Automatización (cron)</h2>
+    <p>El script corre automáticamente todos los martes a las 10am mediante cron de Mac.</p>
+
+    <h3>Ver la configuración actual</h3>
+    <pre>crontab -l</pre>
+
+    <h3>Configurar el cron (primera vez o si se pierde)</h3>
+    <pre>(crontab -l 2>/dev/null; echo "0 10 * * 2 /bin/bash ~/Documents/repatri-monitor/run.sh") | crontab -</pre>
+
+    <h3>Cambiar el horario</h3>
+    <p>El formato es <code>MINUTO HORA DIA_MES MES DIA_SEMANA</code>. Días: 1=lunes, 2=martes, ... 7=domingo.</p>
+    <pre># Ejemplo: miércoles a las 8am
+(crontab -l | grep -v repatri-monitor; echo "0 8 * * 3 /bin/bash ~/Documents/repatri-monitor/run.sh") | crontab -</pre>
+
+    <div class="alert alert-yellow">
+      ⚠️ <strong>Requisitos para que el cron funcione:</strong> Mac encendida + VPN corporativa activa al momento de la ejecución.
+    </div>
+  </div>
+
+  <!-- 10. Alertas -->
+  <div class="section" id="alertas">
+    <h2><span class="num">10</span> Alertas por mail</h2>
+    <p>El script envía un mail automáticamente cuando falla alguno de estos pasos:</p>
+    <ul>
+      <li>VPN no activa al momento de correr</li>
+      <li>Error en el script Python (BQ, API o clasificación)</li>
+      <li>Error al hacer commit o push a GitHub</li>
+    </ul>
+
+    <h3>Configurar el mail destinatario</h3>
+    <p>En <code>run.sh</code>, línea 5:</p>
+    <pre>MAIL_TO="tu.email@mercadolibre.com"</pre>
+
+    <h3>Ejemplo de mail de alerta</h3>
+    <div style="background:#f7f9fc;border-radius:8px;padding:16px 20px;font-size:13px;margin-top:10px;border:1px solid #eee">
+      <strong>Asunto:</strong> [Monitor Clasificador de Estafas] Error en la corrida del 2026-06-03<br><br>
+      Hola,<br><br>
+      El monitor no pudo completar su ejecución del martes 03/06/2026 a las 10:00.<br><br>
+      <strong>Motivo:</strong> VPN corporativa no estaba activa al momento de la ejecución.<br><br>
+      Revisá el log completo en: ~/Documents/repatri-monitor/output/run.log<br><br>
+      Saludos,<br>
+      Monitor Clasificador de Estafas
+    </div>
+  </div>
+
+  <!-- 11. Qué hacer si falla -->
+  <div class="section" id="errores">
+    <h2><span class="num">11</span> Qué hacer si falla</h2>
+
+    <h3>Correr manualmente</h3>
+    <pre>bash ~/Documents/repatri-monitor/run.sh</pre>
+
+    <h3>Ver el log de la última ejecución</h3>
+    <pre>cat ~/Documents/repatri-monitor/output/run.log</pre>
+
+    <h3>Errores comunes y soluciones</h3>
+    <table>
+      <thead><tr><th>Error</th><th>Causa</th><th>Solución</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Timeout / connection refused</td>
+          <td>VPN no activa</td>
+          <td>Conectarse a la VPN y volver a correr</td>
+        </tr>
+        <tr>
+          <td><code>403 Forbidden</code> en BQ</td>
+          <td>Credenciales vencidas</td>
+          <td><code>gcloud auth application-default login</code></td>
+        </tr>
+        <tr>
+          <td><code>403 Forbidden</code> en API</td>
+          <td>Access group no aprobado</td>
+          <td>Solicitar permisos en melihelp</td>
+        </tr>
+        <tr>
+          <td>Authentication failed (GitHub)</td>
+          <td>Token vencido</td>
+          <td>Generar nuevo token en github.com/settings/tokens y actualizar con <code>git remote set-url</code></td>
+        </tr>
+        <tr>
+          <td>pre-commit not found</td>
+          <td>Hook global de Meli</td>
+          <td>Usar <code>git -c core.hooksPath=/dev/null commit</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Actualizar el token de GitHub</h3>
+    <pre>git remote set-url origin https://TU_USUARIO:NUEVO_TOKEN@github.com/TU_USUARIO/repatri-monitor.git</pre>
+
+    <h3>Subir cambios al repo</h3>
+    <pre>cd ~/Documents/repatri-monitor
+git add .
+git -c core.hooksPath=/dev/null commit -m "descripcion del cambio"
+git push origin main</pre>
+  </div>
+
+  <!-- 12. Estructura del repo -->
+  <div class="section" id="github">
+    <h2><span class="num">12</span> Estructura del repositorio</h2>
+    <pre>repatri-monitor/
+├── src/
+│   └── monitor.py        # Script principal (BQ + API + clasificación + HTML)
+├── output/
+│   ├── repatri_monitor_YYYYMMDD.csv   # Resultados por corrida
+│   └── reporte.html                  # Dashboard visual
+├── docs/
+│   └── guia.html         # Esta guía
+├── run.sh                # Runner: verifica VPN, corre Python, pushea a GitHub
+└── .gitignore</pre>
+
+    <h3>Repositorio</h3>
+    <p><a href="https://github.com/marielenatejera-hub/repatri-monitor" style="color:#3483FA">github.com/marielenatejera-hub/repatri-monitor</a></p>
+
+    <div class="alert alert-green">
+      ✅ El reporte HTML actualizado está siempre disponible en:<br>
+      <code>https://github.com/marielenatejera-hub/repatri-monitor/blob/main/output/reporte.html</code>
+    </div>
+  </div>
+
+  <div class="footer">
+    Monitor Clasificador de Estafas · Fraude MercadoPago · Junio 2026
+  </div>
+
+</div>
+</body>
+</html>
