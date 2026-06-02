@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Clasificador de STO — MLA</title>
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+            background:#f5f5f5; color:#333333; padding:32px; }
+
+    /* Header */
+    .header { max-width:1200px; margin:0 auto 28px;
+               display:flex; justify-content:space-between; align-items:flex-end;
+               border-bottom:3px solid #FFE600; padding-bottom:16px; }
+    .header h1 { font-size:26px; font-weight:800; color:#333333; }
+    .header .sub { color:#666; font-size:13px; margin-top:4px; }
+    .header-right { text-align:right; font-size:12px; color:#888; line-height:1.8; }
+    .header-right strong { color:#333333; }
+    .tc-fuente { font-size:11px; color:#aaa; }
+
+    /* KPIs */
+    .kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px;
+                max-width:1200px; margin:0 auto 28px; }
+    .kpi-card { background:#fff; border-radius:12px; padding:20px 24px;
+                 box-shadow:0 1px 6px rgba(0,0,0,0.07); text-align:center; }
+    .kpi-val { font-size:26px; font-weight:800; margin-bottom:6px; }
+    .kpi-lbl { font-size:13px; color:#555; font-weight:600; }
+    .kpi-sub { font-size:11px; color:#aaa; margin-top:3px; }
+
+    /* Sección */
+    .section { max-width:1200px; margin:0 auto 28px; }
+    .section-title { font-size:12px; font-weight:700; text-transform:uppercase;
+                      letter-spacing:.08em; color:#999; margin-bottom:14px; }
+    .summary-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+    .bar-emoji { margin-right:4px; }
+
+    /* Gráfico barras horizontal */
+    .hbar-chart { display:flex; flex-direction:column; gap:10px; }
+    .hbar-row   { display:flex; flex-direction:column; gap:4px; }
+    .hbar-label { font-size:12px; font-weight:600; color:#333333; }
+    .hbar-wrap  { background:#EBEBEB; border-radius:6px; height:28px;
+                   overflow:hidden; position:relative; }
+    .hbar-bar   { height:100%; border-radius:6px; display:flex;
+                   align-items:center; padding-left:8px;
+                   transition:width .4s ease; min-width:32px; }
+    .hbar-val   { font-size:12px; font-weight:800; color:#fff;
+                   text-shadow:0 1px 2px rgba(0,0,0,0.3); white-space:nowrap; }
+    .hbar-wrap  { display:flex; align-items:center; gap:8px; }
+    .hbar-monto { font-size:11px; color:#888; white-space:nowrap; }
+
+    /* Tarjetas categoría */
+    .cat-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+    .cat-card { background:#fff; border-radius:12px; overflow:hidden;
+                 box-shadow:0 1px 8px rgba(0,0,0,0.08); }
+    .cat-header { padding:18px 20px; text-align:center; }
+    .cat-emoji { font-size:32px; margin-bottom:8px; }
+    .cat-title { font-size:16px; font-weight:800; margin-bottom:6px; }
+    .cat-desc  { font-size:12px; opacity:.9; line-height:1.5; }
+    .cat-body  { padding:18px 20px; }
+    .cat-metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:8px;
+                    margin-bottom:18px; text-align:center; }
+    .metric { background:#f7f9fc; border-radius:10px; padding:12px 8px; }
+    .metric-val { font-size:16px; font-weight:800; }
+    .metric-lbl { font-size:10px; color:#999; margin-top:3px;
+                   text-transform:uppercase; letter-spacing:.04em; }
+    .ejemplos-title { font-size:11px; font-weight:700; text-transform:uppercase;
+                       letter-spacing:.06em; color:#bbb; margin-bottom:10px; }
+    .ejemplo { background:#f7f9fc; border-radius:8px; padding:12px 14px; margin-bottom:8px; }
+    .ejemplo:last-child { margin-bottom:0; }
+    .ejemplo-id { font-size:11px; font-weight:700; color:#aaa; display:block; margin-bottom:4px; }
+    .ejemplo p { font-size:13px; color:#444; line-height:1.6; text-align:left; }
+
+    /* Bancos */
+    .card { background:#fff; border-radius:12px; padding:22px 24px;
+             box-shadow:0 1px 6px rgba(0,0,0,0.07); }
+    .bar-row   { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+    .bar-label { font-size:13px; min-width:140px; }
+    .bar-track { flex:1; background:#EBEBEB; border-radius:99px; height:8px; }
+    .bar-fill  { height:8px; border-radius:99px; background:#3483FA; }
+    .bar-cnt   { font-size:12px; color:#666; min-width:80px; text-align:right; }
+
+    @media(max-width:900px){
+      .kpi-row  { grid-template-columns:1fr 1fr; }
+      .cat-grid { grid-template-columns:1fr; }
+      .cat-metrics { grid-template-columns:1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div>
+      <h1>Clasificador de STO — MLA</h1>
+      <div class="sub">Bank Transfer · CVU · 2026-04-01 al 2026-04-30</div>
+    </div>
+    <div class="header-right">
+      Última actualización: <strong>02/06/2026</strong><br>
+      Tipo de cambio oficial: <strong>1 USD = $1,425 ARS</strong><br>
+      <span class="tc-fuente">Fuente: dolarapi.com · Banco Central de la República Argentina · 2026-06-02</span>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-val" style="color:#3483FA">2.621</div>
+      <div class="kpi-lbl">Casos totales</div>
+      <div class="kpi-sub">MLA · CVU · bank transfer</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-val" style="color:#00A650">1.114</div>
+      <div class="kpi-lbl">Con adjunto</div>
+      <div class="kpi-sub">43% del total</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-val" style="color:#FF7733">210</div>
+      <div class="kpi-lbl">Denuncias policiales</div>
+      <div class="kpi-sub">8% del total</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-val" style="color:#F23D4F">USD 606.829</div>
+      <div class="kpi-lbl">Total reclamado</div>
+      <div class="kpi-sub">Mediana USD 281</div>
+    </div></div>
+
+  <!-- Resumen: tipos de fraude + bancos -->
+  <div class="section">
+    <div class="summary-grid">
+      <div class="card">
+        <div class="section-title">Casos por tipo de fraude</div>
+        <div class="hbar-chart">
+    <div class="hbar-row">
+      <div class="hbar-label">📞 Llamada entrante del estafador</div>
+      <div class="hbar-wrap">
+        <div class="hbar-bar" style="width:40.2%;background:#3483FA">
+          <span class="hbar-val">47</span>
+        </div>
+        <span class="hbar-monto"> · USD 120.275</span>
+      </div>
+    </div>
+    <div class="hbar-row">
+      <div class="hbar-label">👤 Cuento del tío digital</div>
+      <div class="hbar-wrap">
+        <div class="hbar-bar" style="width:17.9%;background:#333333">
+          <span class="hbar-val">21</span>
+        </div>
+        <span class="hbar-monto"> · USD 77.350</span>
+      </div>
+    </div>
+    <div class="hbar-row">
+      <div class="hbar-label">💳 Préstamo fraudulento</div>
+      <div class="hbar-wrap">
+        <div class="hbar-bar" style="width:11.1%;background:#F23D4F">
+          <span class="hbar-val">13</span>
+        </div>
+        <span class="hbar-monto"> · USD 53.602</span>
+      </div>
+    </div>
+    <div class="hbar-row">
+      <div class="hbar-label">🔍 Búsqueda activa de contacto</div>
+      <div class="hbar-wrap">
+        <div class="hbar-bar" style="width:3.4%;background:#2968C8">
+          <span class="hbar-val">4</span>
+        </div>
+        <span class="hbar-monto"> · USD 3.937</span>
+      </div>
+    </div>
+    <div class="hbar-row">
+      <div class="hbar-label">📲 Acceso remoto (app instalada)</div>
+      <div class="hbar-wrap">
+        <div class="hbar-bar" style="width:3.4%;background:#FF7733">
+          <span class="hbar-val">4</span>
+        </div>
+        <span class="hbar-monto"> · USD 11.461</span>
+      </div>
+    </div>
+    <div class="hbar-row">
+      <div class="hbar-label">📱 Estafa en redes sociales</div>
+      <div class="hbar-wrap">
+        <div class="hbar-bar" style="width:3.4%;background:#00A650">
+          <span class="hbar-val">4</span>
+        </div>
+        <span class="hbar-monto"> · USD 55.098</span>
+      </div>
+    </div>
+    <div class="hbar-row">
+      <div class="hbar-label">❓ No clasificado</div>
+      <div class="hbar-wrap">
+        <div class="hbar-bar" style="width:100.0%;background:#CCCCCC">
+          <span class="hbar-val">117</span>
+        </div>
+        <span class="hbar-monto"> · USD 285.106</span>
+      </div>
+    </div></div>
+      </div>
+      <div class="card">
+        <div class="section-title">Bancos más frecuentes en denuncias</div>
+        <div class="hbar-chart">
+    <div class="hbar-row">
+      <div class="hbar-label">Banco Nación</div>
+      <div class="hbar-wrap">
+        <div class="hbar-bar" style="width:100.0%;background:#3483FA">
+          <span class="hbar-val">88</span>
+        </div>
+      </div>
+    </div>
+    <div class="hbar-row">
+      <div class="hbar-label">Macro</div>
+      <div class="hbar-wrap">
+        <div class="hbar-bar" style="width:45.5%;background:#3483FA">
+          <span class="hbar-val">40</span>
+        </div>
+      </div>
+    </div>
+    <div class="hbar-row">
+      <div class="hbar-label">Banco Provincia</div>
+      <div class="hbar-wrap">
+        <div class="hbar-bar" style="width:28.4%;background:#3483FA">
+          <span class="hbar-val">25</span>
+        </div>
+      </div>
+    </div>
+    <div class="hbar-row">
+      <div class="hbar-label">Galicia</div>
+      <div class="hbar-wrap">
+        <div class="hbar-bar" style="width:26.1%;background:#3483FA">
+          <span class="hbar-val">23</span>
+        </div>
+      </div>
+    </div>
+    <div class="hbar-row">
+      <div class="hbar-label">Naranja X</div>
+      <div class="hbar-wrap">
+        <div class="hbar-bar" style="width:20.5%;background:#3483FA">
+          <span class="hbar-val">18</span>
+        </div>
+      </div>
+    </div>
+    <div class="hbar-row">
+      <div class="hbar-label">Santander</div>
+      <div class="hbar-wrap">
+        <div class="hbar-bar" style="width:6.8%;background:#3483FA">
+          <span class="hbar-val">6</span>
+        </div>
+      </div>
+    </div>
+    <div class="hbar-row">
+      <div class="hbar-label">Supervielle</div>
+      <div class="hbar-wrap">
+        <div class="hbar-bar" style="width:5.7%;background:#3483FA">
+          <span class="hbar-val">5</span>
+        </div>
+      </div>
+    </div>
+    <div class="hbar-row">
+      <div class="hbar-label">BBVA</div>
+      <div class="hbar-wrap">
+        <div class="hbar-bar" style="width:3.4%;background:#3483FA">
+          <span class="hbar-val">3</span>
+        </div>
+      </div>
+    </div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detalle por categoría -->
+  <div class="section">
+    <div class="section-title">Detalle por tipo de fraude — ordenados por monto reclamado</div>
+    <div class="cat-grid">
+    <div class="cat-card">
+      <div class="cat-header" style="background:#3483FA">
+        <div class="cat-emoji">📞</div>
+        <div class="cat-title" style="color:#fff">Llamada entrante del estafador</div>
+        <div class="cat-desc" style="color:#fff">El estafador llama a la víctima haciéndose pasar por un banco, fintech o empresa de servicios.</div>
+      </div>
+      <div class="cat-body">
+        <div class="cat-metrics">
+          <div class="metric">
+            <div class="metric-val" style="color:#3483FA">47</div>
+            <div class="metric-lbl">Denuncias</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#3483FA">USD 120.275</div>
+            <div class="metric-lbl">Total reclamado</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#3483FA">22%</div>
+            <div class="metric-lbl">% denuncias</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#3483FA">20%</div>
+            <div class="metric-lbl">% monto total</div>
+          </div>
+        </div>
+        <div class="ejemplos-title">Ejemplos reales</div>
+        
+        <div class="ejemplo">
+          <span class="ejemplo-id">Caso #2350033</span>
+          <p>Silvina Paola Avila fue víctima de estafa telefónica. Un hombre se hizo pasar por cliente y contactó por WhatsApp para una supuesta compra. Le pidió datos bancarios y le envió un comprobante falso por un monto mayor al acordado, convenciéndola de devolver la diferencia mediante transferencias reales a cuentas de terceros.</p>
+        </div>
+        <div class="ejemplo">
+          <span class="ejemplo-id">Caso #2344680</span>
+          <p>Claudia Mabel Polverigiani fue contactada telefónicamente por alguien que se hizo pasar por empleado de PAMI, tras haber ingresado sus datos en una publicidad falsa. La guiaron para instalar una aplicación en su teléfono y obtener credenciales de homebanking, vaciando sus cuentas y solicitando un préstamo a su nombre.</p>
+        </div>
+      </div>
+    </div>
+    <div class="cat-card">
+      <div class="cat-header" style="background:#333333">
+        <div class="cat-emoji">👤</div>
+        <div class="cat-title" style="color:#fff">Cuento del tío digital</div>
+        <div class="cat-desc" style="color:#fff">Alguien se hace pasar por un familiar, amigo o conocido vía WhatsApp para solicitar dinero urgente con una excusa fabricada.</div>
+      </div>
+      <div class="cat-body">
+        <div class="cat-metrics">
+          <div class="metric">
+            <div class="metric-val" style="color:#333333">21</div>
+            <div class="metric-lbl">Denuncias</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#333333">USD 77.350</div>
+            <div class="metric-lbl">Total reclamado</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#333333">10%</div>
+            <div class="metric-lbl">% denuncias</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#333333">13%</div>
+            <div class="metric-lbl">% monto total</div>
+          </div>
+        </div>
+        <div class="ejemplos-title">Ejemplos reales</div>
+        
+        <div class="ejemplo">
+          <span class="ejemplo-id">Caso #2356437</span>
+          <p>José Ceferino Saa recibió una llamada de un desconocido que se identificó como su consuegro, alegando que se le había roto el auto y necesitaba asistencia de grúa urgente. Al comunicarse con el supuesto seguro, le exigieron un pago anticipado para enviar el servicio. Saa realizó la transferencia y luego verificó que su consuegro real se encontraba en su domicilio y desconocía completamente el hecho.</p>
+        </div>
+        <div class="ejemplo">
+          <span class="ejemplo-id">Caso #2362902</span>
+          <p>Ester Lidia Fiore recibió mensajes de WhatsApp de alguien que se hizo pasar por su amiga María Teresa Cardenas, solicitando dinero de urgencia desde un número desconocido. Bajo ese engaño, realizó dos transferencias bancarias a nombre de una tercera persona antes de sospechar. Al llamar directamente a su amiga, confirmó que el teléfono había sido hackeado y que ella nunca había solicitado dinero.</p>
+        </div>
+      </div>
+    </div>
+    <div class="cat-card">
+      <div class="cat-header" style="background:#00A650">
+        <div class="cat-emoji">📱</div>
+        <div class="cat-title" style="color:#fff">Estafa en redes sociales</div>
+        <div class="cat-desc" style="color:#fff">El fraude se origina en publicidades o perfiles falsos en Facebook, Instagram u otras redes, ofreciendo inversiones, beneficios o productos inexistentes.</div>
+      </div>
+      <div class="cat-body">
+        <div class="cat-metrics">
+          <div class="metric">
+            <div class="metric-val" style="color:#00A650">4</div>
+            <div class="metric-lbl">Denuncias</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#00A650">USD 55.098</div>
+            <div class="metric-lbl">Total reclamado</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#00A650">2%</div>
+            <div class="metric-lbl">% denuncias</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#00A650">9%</div>
+            <div class="metric-lbl">% monto total</div>
+          </div>
+        </div>
+        <div class="ejemplos-title">Ejemplos reales</div>
+        
+        <div class="ejemplo">
+          <span class="ejemplo-id">Caso #2379686</span>
+          <p>Nadya Andrea Carauni contactó a la supuesta 'Academia de Negocios Vanguard Group' a través de un anuncio en redes sociales. Bajo instrucción de alguien identificado como 'Mariana López', fue inducida a depositar dinero en una billetera virtual para adquirir 'carteras de acciones', con promesa de altos rendimientos que nunca se materializaron y sin posibilidad de recuperar el capital invertido.</p>
+        </div>
+        <div class="ejemplo">
+          <span class="ejemplo-id">Caso #2350163</span>
+          <p>María Rosa Alaniz fue atraída por una publicidad falsa en Facebook que ofrecía computadoras gratuitas para jubilados. Al manifestar interés, recibió una llamada telefónica donde terceros la guiaron para acceder a su teléfono y cuentas bancarias, solicitando un préstamo a su nombre sin consentimiento y transfiriendo el dinero de forma inmediata.</p>
+        </div>
+      </div>
+    </div>
+    <div class="cat-card">
+      <div class="cat-header" style="background:#F23D4F">
+        <div class="cat-emoji">💳</div>
+        <div class="cat-title" style="color:#fff">Préstamo fraudulento</div>
+        <div class="cat-desc" style="color:#fff">Los estafadores acceden a las cuentas de la víctima y solicitan préstamos a su nombre sin consentimiento, transfiriendo el dinero de inmediato.</div>
+      </div>
+      <div class="cat-body">
+        <div class="cat-metrics">
+          <div class="metric">
+            <div class="metric-val" style="color:#F23D4F">13</div>
+            <div class="metric-lbl">Denuncias</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#F23D4F">USD 53.602</div>
+            <div class="metric-lbl">Total reclamado</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#F23D4F">6%</div>
+            <div class="metric-lbl">% denuncias</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#F23D4F">9%</div>
+            <div class="metric-lbl">% monto total</div>
+          </div>
+        </div>
+        <div class="ejemplos-title">Ejemplos reales</div>
+        
+        <div class="ejemplo">
+          <span class="ejemplo-id">Caso #2349747</span>
+          <p>La víctima publicó muebles en Facebook Marketplace. Un supuesto comprador envió comprobante falso alegando haber transferido un monto mayor por error. Estafadores que se hicieron pasar por personal del Banco Macro la guiaron para solicitar un préstamo y devolver la diferencia, transfiriendo los fondos a cuentas de terceros que ella desconocía.</p>
+        </div>
+        <div class="ejemplo">
+          <span class="ejemplo-id">Caso #2362412</span>
+          <p>María Susana Urbani buscó el número de Tarjeta Naranja en Google. Los estafadores obtuvieron sus datos biométricos mediante videollamada, ingresaron a su Home Banking y solicitaron un préstamo personal a su nombre sin consentimiento alguno, transfiriendo de inmediato la totalidad de los fondos obtenidos.</p>
+        </div>
+      </div>
+    </div>
+    <div class="cat-card">
+      <div class="cat-header" style="background:#FF7733">
+        <div class="cat-emoji">📲</div>
+        <div class="cat-title" style="color:#fff">Acceso remoto (app instalada)</div>
+        <div class="cat-desc" style="color:#fff">Los estafadores convencen a la víctima de instalar una app de control remoto (AnyDesk, Ultra VNC, Supremo) para tomar el control del dispositivo.</div>
+      </div>
+      <div class="cat-body">
+        <div class="cat-metrics">
+          <div class="metric">
+            <div class="metric-val" style="color:#FF7733">4</div>
+            <div class="metric-lbl">Denuncias</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#FF7733">USD 11.461</div>
+            <div class="metric-lbl">Total reclamado</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#FF7733">2%</div>
+            <div class="metric-lbl">% denuncias</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#FF7733">2%</div>
+            <div class="metric-lbl">% monto total</div>
+          </div>
+        </div>
+        <div class="ejemplos-title">Ejemplos reales</div>
+        
+        <div class="ejemplo">
+          <span class="ejemplo-id">Caso #2371331</span>
+          <p>Marta Yolanda Maidana intentó descargar un recibo en una página falsa del IPS y dejó su número de contacto. Fue contactada por WhatsApp y durante una videollamada la indujeron a compartir pantalla y descargar 'SUPREMO MOBILE'. Los estafadores tomaron control total de su dispositivo, robaron credenciales de homebanking, solicitaron préstamos a su nombre y vaciaron todas sus cuentas.</p>
+        </div>
+        <div class="ejemplo">
+          <span class="ejemplo-id">Caso #2366252</span>
+          <p>La víctima recibió una llamada de WhatsApp de alguien que se presentó como empleado de Movistar ofreciendo beneficios para jubilados. La convencieron de descargar ULTRA VNC mediante un enlace enviado por el mismo canal. Una vez instalada la app, los estafadores tomaron control remoto del teléfono y realizaron múltiples transferencias bancarias sin su consentimiento.</p>
+        </div>
+      </div>
+    </div>
+    <div class="cat-card">
+      <div class="cat-header" style="background:#2968C8">
+        <div class="cat-emoji">🔍</div>
+        <div class="cat-title" style="color:#fff">Búsqueda activa de contacto</div>
+        <div class="cat-desc" style="color:#fff">La víctima busca en Google o redes el número de atención de una entidad y contacta sin saberlo a un estafador.</div>
+      </div>
+      <div class="cat-body">
+        <div class="cat-metrics">
+          <div class="metric">
+            <div class="metric-val" style="color:#2968C8">4</div>
+            <div class="metric-lbl">Denuncias</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#2968C8">USD 3.937</div>
+            <div class="metric-lbl">Total reclamado</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#2968C8">2%</div>
+            <div class="metric-lbl">% denuncias</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#2968C8">1%</div>
+            <div class="metric-lbl">% monto total</div>
+          </div>
+        </div>
+        <div class="ejemplos-title">Ejemplos reales</div>
+        
+        <div class="ejemplo">
+          <span class="ejemplo-id">Caso #2372195</span>
+          <p>Juan Alberto Morales buscó en internet el número de atención de VISA tras notar una transferencia desconocida en su cuenta. Fue contactado por WhatsApp por un estafador que se presentó como representante de la empresa. Con la excusa de unificar cuentas y reintegrar el dinero, obtuvo sus credenciales bancarias y realizó múltiples transferencias no autorizadas.</p>
+        </div>
+        <div class="ejemplo">
+          <span class="ejemplo-id">Caso #2362412</span>
+          <p>María Susana Urbani buscó en Google el número de Tarjeta Naranja para consultar un problema. Los estafadores le solicitaron datos personales y realizaron una videollamada para fotografiar su rostro. Con esa información ingresaron a su Home Banking, sacaron un préstamo personal a su nombre y transfirieron la totalidad de los fondos.</p>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+</body>
+</html>
