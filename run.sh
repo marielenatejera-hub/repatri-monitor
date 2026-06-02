@@ -23,7 +23,7 @@ python3 src/monitor.py >> "$LOG_FILE" 2>&1
 
 # Push a GitHub
 git add output/
-git commit -m "Monitor $(date '+%Y-%m-%d')" >> "$LOG_FILE" 2>&1
+git -c core.hooksPath=/dev/null commit -m "Monitor $(date '+%Y-%m-%d')" >> "$LOG_FILE" 2>&1
 git push origin main >> "$LOG_FILE" 2>&1
 
 echo "Fin: $(date)" >> "$LOG_FILE"

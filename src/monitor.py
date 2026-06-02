@@ -313,8 +313,238 @@ def main():
     except Exception as e:
         print(f"Error al subir a Sheets: {e}")
 
+    # 5. Generar HTML
+    try:
+        print("Generando reporte HTML...")
+        html_file = generar_html(resultados, outfile)
+        print(f"HTML guardado: {html_file}")
+    except Exception as e:
+        print(f"Error al generar HTML: {e}")
+
     print(f"Fin: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
     return outfile
+
+
+# ── Generador HTML ────────────────────────────────────────────────────────────
+
+MELI_BLUE   = "#3483FA"
+MELI_GREEN  = "#00A650"
+MELI_ORANGE = "#FF7733"
+MELI_RED    = "#F23D4F"
+MELI_LBLUE  = "#2968C8"
+MELI_DARK   = "#333333"
+MELI_YELLOW = "#FFE600"
+MELI_GRAY   = "#EBEBEB"
+
+CAT_CFG = {
+    "Llamada entrante del estafador": {"emoji": "📞", "color": MELI_BLUE},
+    "Búsqueda activa de contacto":    {"emoji": "🔍", "color": MELI_LBLUE},
+    "Acceso remoto (app instalada)":  {"emoji": "📲", "color": MELI_ORANGE},
+    "Préstamo fraudulento":           {"emoji": "💳", "color": MELI_RED},
+    "Estafa en redes sociales":       {"emoji": "📱", "color": MELI_GREEN},
+    "Cuento del tío digital":         {"emoji": "👤", "color": MELI_DARK},
+    "No clasificado":                 {"emoji": "❓", "color": "#CCCCCC"},
+}
+
+BANCOS_EMISORES = [
+    ("Banco Nación",    ["banco nación","banco nacion","bna+","bna "]),
+    ("Galicia",         ["galicia"]),
+    ("Macro",           ["banco macro"," macro"]),
+    ("Santander",       ["santander"]),
+    ("BBVA",            ["bbva"]),
+    ("Banco Provincia", ["banco provincia","bapro"]),
+    ("Brubank",         ["brubank"]),
+    ("Nu",              ["nubank"," nu "]),
+    ("Naranja X",       ["naranja x","naranjax"]),
+    ("ICBC",            ["icbc"]),
+    ("Itaú",            ["itaú","itau"]),
+    ("Supervielle",     ["supervielle"]),
+]
+
+MONTO_HTML_RE = re.compile(r'\$\s?([\d]{1,3}(?:[.,]\d{3})*(?:[.,]\d{1,2})?)')
+
+def _parsear_monto(s):
+    s = s.strip().replace(" ","")
+    m = re.match(r'^([\d.,]+)[.,](\d{1,2})$', s)
+    if m:
+        return float(re.sub(r'[.,]','',m.group(1))+'.'+m.group(2))
+    return float(re.sub(r'[.,]','',s))
+
+def _extraer_montos(texto):
+    vals = []
+    for match in MONTO_HTML_RE.finditer(texto):
+        try:
+            v = _parsear_monto(match.group(1))
+            if 0 < v <= 10_000_000:
+                vals.append(v)
+        except: pass
+    return vals
+
+def _tipo_cambio():
+    try:
+        r    = requests.get("https://dolarapi.com/v1/dolares/oficial", timeout=5)
+        data = r.json()
+        return (data["compra"] + data["venta"]) / 2, data.get("fechaActualizacion","")[:10]
+    except:
+        return 1400, "N/D"
+
+def generar_html(resultados, csv_path):
+    from collections import Counter as Ctr
+
+    tc, tc_fecha = _tipo_cambio()
+
+    def fmt_usd(n): return f"USD {n/tc:,.0f}".replace(",",".")
+
+    kw_denuncia = ["denuncia","constancia policial","actuaciones policiales","denunciante","damnificad"]
+    denuncias   = [r for r in resultados if r.get("tiene_denuncia") == "SI"]
+    total_casos = len(resultados)
+
+    # Montos y bancos
+    counter_fraude = Ctr(r["tipo_fraude"] for r in denuncias if r["tipo_fraude"])
+    montos_por_cat = {}
+    counter_bancos = Ctr()
+    todos_montos   = []
+
+    for r in denuncias:
+        texto  = r.get("ai_response","")
+        cat    = r.get("tipo_fraude","No clasificado") or "No clasificado"
+        montos = _extraer_montos(texto)
+        montos_por_cat.setdefault(cat, []).extend(montos)
+        todos_montos.extend(montos)
+        for nombre, variantes in BANCOS_EMISORES:
+            if any(v in texto.lower() for v in variantes):
+                counter_bancos[nombre] += 1
+
+    total_monto = sum(todos_montos)
+    mediana     = sorted(todos_montos)[len(todos_montos)//2] if todos_montos else 0
+    con_adjunto = sum(1 for r in resultados if r.get("tiene_adjunto") == "SI")
+
+    # Ordenar cats por cantidad de denuncias
+    max_cnt = max(counter_fraude.values()) if counter_fraude else 1
+    cats_ordenadas = sorted(CAT_CFG.items(), key=lambda x: counter_fraude.get(x[0], 0), reverse=True)
+
+    def hbar(label, emoji, color, cnt, monto_str=""):
+        pct = cnt / max_cnt * 100 if max_cnt else 0
+        return f"""
+        <div class="hbar-row">
+          <div class="hbar-label">{emoji} {label}</div>
+          <div class="hbar-wrap">
+            <div class="hbar-track">
+              <div class="hbar-bar" style="width:{pct:.1f}%;background:{color}">
+                <span class="hbar-val">{cnt}</span>
+              </div>
+            </div>
+            <span class="hbar-monto">{monto_str}</span>
+          </div>
+        </div>"""
+
+    fraude_html = '<div class="hbar-chart">'
+    for cat, cfg in cats_ordenadas:
+        cnt   = counter_fraude.get(cat, 0)
+        total = sum(montos_por_cat.get(cat, []))
+        fraude_html += hbar(cat, cfg["emoji"], cfg["color"], cnt, fmt_usd(total) if total else "")
+    nc = counter_fraude.get("No clasificado", 0)
+    fraude_html += hbar("No clasificado", "❓", "#CCCCCC", nc)
+    fraude_html += "</div>"
+
+    max_banco = max(counter_bancos.values()) if counter_bancos else 1
+    bancos_html = '<div class="hbar-chart">'
+    for banco, cnt in counter_bancos.most_common(8):
+        pct = cnt / max_banco * 100
+        bancos_html += f"""
+        <div class="hbar-row">
+          <div class="hbar-label">{banco}</div>
+          <div class="hbar-wrap">
+            <div class="hbar-track">
+              <div class="hbar-bar" style="width:{pct:.1f}%;background:{MELI_BLUE}">
+                <span class="hbar-val">{cnt}</span>
+              </div>
+            </div>
+          </div>
+        </div>"""
+    bancos_html += "</div>"
+
+    def kpi(val, lbl, sub, color):
+        return f"""<div class="kpi-card">
+          <div class="kpi-val" style="color:{color}">{val}</div>
+          <div class="kpi-lbl">{lbl}</div>
+          <div class="kpi-sub">{sub}</div>
+        </div>"""
+
+    kpis = (
+        kpi(f"{total_casos:,}".replace(",","."), "Casos totales", "MLA · CVU · bank transfer", MELI_BLUE) +
+        kpi(f"{con_adjunto:,}".replace(",","."), "Con adjunto", f"{con_adjunto/total_casos*100:.0f}% del total" if total_casos else "-", MELI_GREEN) +
+        kpi(str(len(denuncias)), "Denuncias policiales", f"{len(denuncias)/total_casos*100:.0f}% del total" if total_casos else "-", MELI_ORANGE) +
+        kpi(fmt_usd(total_monto), "Total reclamado", f"Mediana {fmt_usd(mediana)}", MELI_RED)
+    )
+
+    fecha_reporte = datetime.today().strftime("%d/%m/%Y")
+
+    html = f"""<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Clasificador de STO — MLA</title>
+  <style>
+    *{{box-sizing:border-box;margin:0;padding:0}}
+    body{{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f5;color:{MELI_DARK};padding:32px}}
+    .header{{max-width:1200px;margin:0 auto 28px;display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid {MELI_YELLOW};padding-bottom:16px}}
+    .header h1{{font-size:26px;font-weight:800}}
+    .header .sub{{color:#666;font-size:13px;margin-top:4px}}
+    .header-right{{text-align:right;font-size:12px;color:#888;line-height:1.8}}
+    .header-right strong{{color:{MELI_DARK}}}
+    .tc-fuente{{font-size:11px;color:#aaa}}
+    .kpi-row{{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:1200px;margin:0 auto 28px}}
+    .kpi-card{{background:#fff;border-radius:12px;padding:20px 24px;box-shadow:0 1px 6px rgba(0,0,0,0.07);text-align:center}}
+    .kpi-val{{font-size:26px;font-weight:800;margin-bottom:6px}}
+    .kpi-lbl{{font-size:13px;color:#555;font-weight:600}}
+    .kpi-sub{{font-size:11px;color:#aaa;margin-top:3px}}
+    .section{{max-width:1200px;margin:0 auto 28px}}
+    .section-title{{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#999;margin-bottom:14px}}
+    .summary-grid{{display:grid;grid-template-columns:1fr 1fr;gap:20px}}
+    .card{{background:#fff;border-radius:12px;padding:22px 24px;box-shadow:0 1px 6px rgba(0,0,0,0.07)}}
+    .hbar-chart{{display:flex;flex-direction:column;gap:10px}}
+    .hbar-row{{display:flex;flex-direction:column;gap:4px}}
+    .hbar-label{{font-size:12px;font-weight:600;color:{MELI_DARK}}}
+    .hbar-wrap{{display:flex;align-items:center;gap:8px}}
+    .hbar-track{{flex:1;background:{MELI_GRAY};border-radius:6px;height:28px;overflow:hidden}}
+    .hbar-bar{{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:8px;min-width:32px}}
+    .hbar-val{{font-size:12px;font-weight:800;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.3);white-space:nowrap}}
+    .hbar-monto{{font-size:11px;color:#888;white-space:nowrap;min-width:80px}}
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h1>Clasificador de STO — MLA</h1>
+      <div class="sub">Bank Transfer · CVU · Últimas 3 semanas</div>
+    </div>
+    <div class="header-right">
+      Última actualización: <strong>{fecha_reporte}</strong><br>
+      Tipo de cambio oficial: <strong>1 USD = ${tc:,.0f} ARS</strong><br>
+      <span class="tc-fuente">Fuente: dolarapi.com · BCRA · {tc_fecha}</span>
+    </div>
+  </div>
+  <div class="kpi-row">{kpis}</div>
+  <div class="section">
+    <div class="summary-grid">
+      <div class="card">
+        <div class="section-title">Casos por tipo de fraude</div>
+        {fraude_html}
+      </div>
+      <div class="card">
+        <div class="section-title">Bancos más frecuentes en denuncias</div>
+        {bancos_html}
+      </div>
+    </div>
+  </div>
+</body>
+</html>"""
+
+    html_path = OUTPUT_DIR / "reporte.html"
+    html_path.write_text(html, encoding="utf-8")
+    return html_path
+
 
 if __name__ == "__main__":
     main()
