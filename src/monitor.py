@@ -7,11 +7,15 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from collections import defaultdict
 
+import gspread
+from google.auth import default as google_auth_default
 from google.cloud import bigquery
 
 # ── Configuración ────────────────────────────────────────────────────────────
 
-BQ_PROJECT  = "meli-bi-data"
+BQ_PROJECT    = "meli-bi-data"
+SHEETS_ID     = "1slABqtcAmMVOVGq1HEEeN31geH-c2E5hSk3pVIdp47M"
+SHEETS_TAB    = "Datos"
 API_BASE    = "https://fpr-cross.melioffice.com/attachments"
 API_HEADERS = {"X-Scope": "fraud", "X-External-System": "FPR_REPATRIATION"}
 USER_PROMPT = (
@@ -281,8 +285,33 @@ def main():
     for tipo, cnt in Counter(r["tipo_fraude"] for r in resultados if r["tiene_denuncia"]=="SI").most_common():
         print(f"  {tipo:<40} {cnt}")
     print(f"\nCSV guardado: {outfile}")
-    print(f"Fin: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
 
+    # 4. Upload a Google Sheets
+    try:
+        print("Subiendo a Google Sheets...")
+        creds, _ = google_auth_default(scopes=[
+            "https://www.googleapis.com/auth/spreadsheets",
+            "https://www.googleapis.com/auth/drive",
+        ])
+        gc = gspread.authorize(creds)
+        sh = gc.open_by_key(SHEETS_ID)
+
+        # Crear o limpiar el tab
+        try:
+            ws = sh.worksheet(SHEETS_TAB)
+            ws.clear()
+        except gspread.exceptions.WorksheetNotFound:
+            ws = sh.add_worksheet(title=SHEETS_TAB, rows=5000, cols=20)
+
+        # Escribir encabezado + datos
+        header = campos
+        filas  = [[str(r.get(c, "")) for c in campos] for r in resultados]
+        ws.update([header] + filas)
+        print(f"Google Sheets actualizado: {len(resultados)} filas")
+    except Exception as e:
+        print(f"Error al subir a Sheets: {e}")
+
+    print(f"Fin: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
     return outfile
 
 if __name__ == "__main__":
