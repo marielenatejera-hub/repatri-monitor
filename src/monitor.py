@@ -88,10 +88,7 @@ KW_DENUNCIA = [
 # ── BigQuery ─────────────────────────────────────────────────────────────────
 
 def get_case_ids():
-    # Ventana: últimos 30 días
-    end   = datetime.today().replace(hour=23, minute=59, second=59)
-    start = (end - timedelta(days=30)).replace(hour=0, minute=0, second=0)
-
+    # Ventana: últimas 3 semanas completas (lunes a domingo)
     query = f"""
     SELECT DISTINCT
       a.REPATRI_CASE_ID,
@@ -108,7 +105,12 @@ def get_case_ids():
     FROM `{BQ_PROJECT}.WHOWNER.LK_FPR_REPATRI_CASE` a
     CROSS JOIN UNNEST(INVOLVED_CUSTS)         AS inv
     CROSS JOIN UNNEST(CONTESTED_TRANSACTIONS) AS txn
-    WHERE a.CREATED_AT_DATETIME BETWEEN '{start.strftime("%Y-%m-%d")}' AND '{end.strftime("%Y-%m-%d")}'
+    WHERE a.CREATED_AT_DATETIME >= DATETIME(
+            DATE_SUB(DATE_TRUNC(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), WEEK(MONDAY)), INTERVAL 3 WEEK)
+          )
+      AND a.CREATED_AT_DATETIME <  DATETIME(
+            DATE_ADD(DATE_TRUNC(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), WEEK(MONDAY)), INTERVAL 1 WEEK)
+          )
       AND a.FLOW_TYPE       = 'REFUND'
       AND a.CURRENT_STATUS  = 'CLOSED'
       AND a.SITE            = 'MLA'
@@ -117,7 +119,7 @@ def get_case_ids():
     """
 
     client = bigquery.Client(project=BQ_PROJECT)
-    print(f"Corriendo query BQ ({start.date()} → {end.date()})...")
+    print(f"Corriendo query BQ (últimas 3 semanas completas)...")
     rows = list(client.query(query).result())
     print(f"  {len(rows)} filas obtenidas")
     return rows
