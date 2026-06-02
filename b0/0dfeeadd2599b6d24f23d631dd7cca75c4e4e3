@@ -1,0 +1,28 @@
+docs/guia.html
+  s_c33484effb4a4e::t_95e7c8a38ed570 136
+  s_c33484effb4a4e::t_b2a760e7b60c12 124
+  s_c33484effb4a4e::t_8d1fd36089febe 356
+  s_c33484effb4a4e::t_cb603c74f0e737 261
+  s_c33484effb4a4e::t_df70b7ac15e173 48-49
+  s_c33484effb4a4e::t_aad7ab0db2f3ec 55
+  s_c33484effb4a4e::t_5d500ecb6943af 97,99
+  s_c33484effb4a4e::t_3e0e553cff790c 383
+  s_c33484effb4a4e::t_643b3dc2a5a13e 1-4,6-47,50-54,56-96,98,100-123,125-135,137-260,262-355,357-382,384-440,442,444-446,448-526,528-532
+  s_c33484effb4a4e::t_ccc89cc7da3441 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b00dfeeadd2599b6d24f23d631dd7cca75c4e4e3",
+  "prompts": {},
+  "sessions": {
+    "s_c33484effb4a4e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cdda7b70-5f21-4a2e-92ab-4bd64a09a285",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Marielena Perez <marielena.tejera@mercadolibre.com>"
+    }
+  }
+}
