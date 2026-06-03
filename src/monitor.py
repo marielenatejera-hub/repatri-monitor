@@ -313,11 +313,17 @@ def main():
     except Exception as e:
         print(f"Error al subir a Sheets: {e}")
 
-    # 5. Generar HTML
+    # 5. Generar HTML con reporte_repatri.py
     try:
         print("Generando reporte HTML...")
-        html_file = generar_html(resultados, outfile)
-        print(f"HTML guardado: {html_file}")
+        import subprocess
+        resultado = subprocess.run(
+            ["python3", str(Path(__file__).parent / "reporte.py")],
+            capture_output=True, text=True
+        )
+        print(resultado.stdout)
+        if resultado.returncode != 0:
+            print(f"Error en reporte.py: {resultado.stderr}")
     except Exception as e:
         print(f"Error al generar HTML: {e}")
 
