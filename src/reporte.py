@@ -2,7 +2,7 @@ import csv
 import json
 import re
 from pathlib import Path
-from collections import Counter
+from collections import Counter, defaultdict
 from datetime import datetime
 
 OUTPUT_DIR  = Path.home() / "Documents" / "repatri-monitor" / "output"
@@ -26,9 +26,10 @@ MELI_DARK    = "#333333"
 MELI_GRAY    = "#EBEBEB"
 
 # ── Config ────────────────────────────────────────────────────────────────────
-FECHA_INICIO = "2026-04-01"
-FECHA_FIN    = "2026-04-30"
-TOTAL_CASOS  = 2621
+# Fechas y total se calculan dinámicamente desde el CSV
+FECHA_INICIO = None
+FECHA_FIN    = None
+TOTAL_CASOS  = None
 
 def obtener_tipo_cambio():
     try:
@@ -106,6 +107,13 @@ CATEGORIAS = {
             ("2362902", "Ester Lidia Fiore recibió mensajes de WhatsApp de alguien que se hizo pasar por su amiga María Teresa Cardenas, solicitando dinero de urgencia desde un número desconocido. Bajo ese engaño, realizó dos transferencias bancarias a nombre de una tercera persona antes de sospechar. Al llamar directamente a su amiga, confirmó que el teléfono había sido hackeado y que ella nunca había solicitado dinero."),
         ],
     },
+    "Robo de dispositivo": {
+        "emoji": "📵",
+        "desc": "El fraude ocurre tras el robo o hurto del celular de la víctima, aprovechando el acceso físico para realizar transferencias no autorizadas.",
+        "kw": ["robo de celular","hurto de dispositivo","robo a mano armada","vaciamiento de cuentas por acceso físico"],
+        "color": "#7F8C8D",
+        "ejemplos": [],
+    },
 }
 
 KW_DENUNCIA = ["denuncia","constancia policial","actuaciones policiales","denunciante","damnificad"]
@@ -145,6 +153,63 @@ def extraer_montos(texto):
         except: pass
     return vals
 
+MAPEO_IA = {
+    "Llamada entrante del estafador": [
+        "vishing", "estafa telefónica", "falso soporte", "falso empleado",
+        "llamada", "falso banco", "falso accidente",
+    ],
+    "Búsqueda activa de contacto": [
+        "phishing whatsapp", "phishing", "buscó en google", "buscó el número",
+        "falso asesor", "número falso", "pantalla compartida",
+        "compra fraudulenta por whatsapp", "estafa compra de dólares",
+        "venta de dólares", "compra fraudulenta instagram",
+    ],
+    "Acceso remoto (app instalada)": [
+        "acceso remoto", "anydesk", "ultra vnc", "supremo", "malware",
+        "toma de control", "hackeo", "acceso no autorizado",
+        "defraudación informática",
+    ],
+    "Préstamo fraudulento": [
+        "préstamo fraudulento", "préstamo no autorizado", "crédito fraudulento",
+        "transferencia no autorizada", "transferencias no autorizadas",
+        "transferencia no reconocida", "transferencias no reconocidas",
+        "movimientos no reconocidos", "movimientos bancarios no reconocidos",
+        "fraude home banking", "fraude bancario", "fraude por home banking",
+        "vaciamiento de cuenta", "transferencia fraudulenta",
+        "transferencias fraudulentas", "transferencias bancarias no autorizadas",
+        "transferencias bancarias no reconocidas", "transferencia por error",
+        "estafa por transferencia",
+    ],
+    "Estafa en redes sociales": [
+        "falsa venta online", "falsa venta en redes", "falsa venta por redes",
+        "falso alquiler", "estafa alquiler", "falsa venta por whatsapp",
+        "marketplace", "compra online", "inversión fraudulenta",
+        "plataforma de inversión", "inversión en cripto", "criptomonedas",
+        "estafa de inversión", "falsa plataforma", "estafa en compraventa",
+        "compraventa falsa", "falsa venta de vehículo", "compraventa de vehículo",
+        "falso servicio", "estafa por venta", "estafa por alquiler",
+        "estafa genérica", "estafa de compraventa",
+    ],
+    "Cuento del tío digital": [
+        "suplantación de identidad", "cuento del tío", "falso familiar",
+        "falso conocido", "hackeo de whatsapp", "robo de whatsapp",
+        "extorsión", "curandero", "falso curandero", "estafa espiritual",
+    ],
+    "Robo de dispositivo": [
+        "robo de celular", "hurto de dispositivo", "robo a mano armada",
+        "robo/hurto", "robo con engaño", "hurto seguido",
+        "vaciamiento de cuentas por acceso físico",
+    ],
+}
+
+def mapear_tipo_ia(tipo_fraude):
+    """Mapea el tipo_fraude libre de la IA a una categoría del reporte."""
+    t = tipo_fraude.lower()
+    for cat, terminos in MAPEO_IA.items():
+        if any(term in t for term in terminos):
+            return cat
+    return tipo_fraude  # devuelve el valor original si no matchea
+
 def clasificar(texto):
     t = texto.lower()
     for cat, cfg in CATEGORIAS.items():
@@ -159,16 +224,27 @@ def fmt_usd(n): return f"USD {n/TIPO_CAMBIO:,.0f}".replace(",",".")
 with open(INPUT_CSV, newline="", encoding="utf-8") as f:
     rows = list(csv.DictReader(f))
 
-con_adjunto    = [r for r in rows if r["ai_response"] not in ("SIN ADJUNTO","") and not r["ai_response"].startswith("ERROR")]
-denuncias      = [r for r in con_adjunto if any(kw in r["ai_response"].lower() for kw in KW_DENUNCIA)]
+# Calcular fechas y total dinámicamente
+TOTAL_CASOS  = len(rows)
+fechas = [r.get("created_at","") for r in rows if r.get("created_at","")]
+FECHA_INICIO = min(fechas)[:10] if fechas else "N/D"
+FECHA_FIN    = max(fechas)[:10] if fechas else "N/D"
+
+con_adjunto    = [r for r in rows if r.get("tiene_adjunto") == "SI"]
+denuncias      = [r for r in rows if r.get("tiene_denuncia") == "SI"]
 counter_fraude = Counter()
 montos_por_cat = {}
 todos_montos   = []
 counter_bancos = Counter()
 
 for r in denuncias:
-    texto  = r["ai_response"]
-    cat    = clasificar(texto)
+    texto  = r.get("ai_response", "")
+    # Usar tipo_fraude del CSV (clasificado por IA), mapearlo a categoría
+    tipo_ia = r.get("tipo_fraude", "").strip()
+    if tipo_ia and tipo_ia != "No clasificado":
+        cat = mapear_tipo_ia(tipo_ia)
+    else:
+        cat = clasificar(texto) or "No clasificado"
     montos = extraer_montos(texto)
     bancos = [nombre for nombre, variantes in BANCOS if any(v in texto.lower() for v in variantes)]
     counter_fraude[cat] += 1
@@ -179,12 +255,72 @@ for r in denuncias:
 total_monto = sum(todos_montos)
 mediana     = sorted(todos_montos)[len(todos_montos)//2] if todos_montos else 0
 
-# Ordenar categorías por % del monto total (descendente)
-cats_ordenadas = sorted(
-    CATEGORIAS.items(),
-    key=lambda x: sum(montos_por_cat.get(x[0], [])),
+# Generar ejemplos reales del CSV por categoría
+def formatear_respuesta_ia(texto):
+    """Parsea la respuesta JSON de la IA y la devuelve como HTML con bullets."""
+    try:
+        import json as _json
+        match = re.search(r'\{.*\}', texto, re.DOTALL)
+        if match:
+            data = _json.loads(match.group())
+            items = []
+            if data.get("resumen"):
+                items.append(f"<b>Resumen:</b> {data['resumen']}")
+            if data.get("montos"):
+                montos = data["montos"]
+                if isinstance(montos, list):
+                    montos_str = ", ".join(f"${m}" for m in montos if m)
+                else:
+                    montos_str = str(montos)
+                items.append(f"<b>Montos:</b> {montos_str}")
+            if data.get("instituciones"):
+                insts = data["instituciones"]
+                if isinstance(insts, list):
+                    insts_str = ", ".join(str(i) for i in insts if i)
+                else:
+                    insts_str = str(insts)
+                items.append(f"<b>Instituciones:</b> {insts_str}")
+            if items:
+                return "<ul style='margin:4px 0 0 16px;padding:0'>" + "".join(f"<li>{i}</li>" for i in items) + "</ul>"
+    except Exception:
+        pass
+    # Fallback: texto limpio sin JSON
+    limpio = re.sub(r'```json|```', '', texto).replace("\n", " ").replace("**", "").strip()
+    return limpio
+
+ejemplos_reales = {}
+casos_por_cat = defaultdict(list)
+for r in denuncias:
+    tipo_ia = r.get("tipo_fraude", "").strip()
+    cat = mapear_tipo_ia(tipo_ia) if tipo_ia and tipo_ia != "No clasificado" else clasificar(r.get("ai_response",""))
+    casos_por_cat[cat].append(r)
+
+for cat, casos in casos_por_cat.items():
+    ejemplos = []
+    for r in casos[:2]:
+        texto = r.get("ai_response", "")
+        resumen = formatear_respuesta_ia(texto)
+        ejemplos.append((r["repatri_case_id"], resumen))
+    ejemplos_reales[cat] = ejemplos
+
+# Inyectar ejemplos reales en CATEGORIAS
+for cat in CATEGORIAS:
+    if cat in ejemplos_reales:
+        CATEGORIAS[cat]["ejemplos"] = ejemplos_reales[cat]
+
+# Ordenar categorías conocidas por cantidad de denuncias, las dinámicas al final
+cats_conocidas = sorted(
+    [(cat, cfg) for cat, cfg in CATEGORIAS.items() if cat in counter_fraude],
+    key=lambda x: counter_fraude.get(x[0], 0),
     reverse=True
 )
+# Categorías dinámicas que la IA detectó y no estaban predefinidas
+cats_dinamicas = [
+    (cat, {"emoji": "🔎", "color": "#7F8C8D", "desc": "Categoría detectada automáticamente por IA", "ejemplos": ejemplos_reales.get(cat, [])})
+    for cat in counter_fraude
+    if cat not in CATEGORIAS and cat != "No clasificado"
+]
+cats_ordenadas = cats_conocidas + cats_dinamicas
 
 # ── Tarjetas ──────────────────────────────────────────────────────────────────
 
@@ -194,23 +330,25 @@ def tarjeta_categoria(cat, cfg):
     total = sum(ms)
     pct_n = cnt / len(denuncias) * 100 if denuncias else 0
     pct_m = total / total_monto * 100 if total_monto else 0
-    c     = cfg["color"]
+    c     = cfg.get("color", "#7F8C8D")
     txt   = "#fff" if c != MELI_YELLOW else MELI_DARK
+    desc  = cfg.get("desc", "Categoría detectada automáticamente por IA")
+    emoji = cfg.get("emoji", "🔎")
 
     ejemplos_html = ""
-    for case_id, texto in cfg["ejemplos"]:
+    for case_id, texto in cfg.get("ejemplos", []):
         ejemplos_html += f"""
         <div class="ejemplo">
           <span class="ejemplo-id">Caso #{case_id}</span>
-          <p>{texto}</p>
+          <div>{texto}</div>
         </div>"""
 
     return f"""
     <div class="cat-card">
       <div class="cat-header" style="background:{c}">
-        <div class="cat-emoji">{cfg['emoji']}</div>
+        <div class="cat-emoji">{emoji}</div>
         <div class="cat-title" style="color:{txt}">{cat}</div>
-        <div class="cat-desc" style="color:{txt}">{cfg['desc']}</div>
+        <div class="cat-desc" style="color:{txt}">{desc}</div>
       </div>
       <div class="cat-body">
         <div class="cat-metrics">
@@ -297,7 +435,7 @@ def kpi(val, lbl, sub, color):
     </div>"""
 
 kpis_html = (
-    kpi(f"{TOTAL_CASOS:,}".replace(",","."), "Casos totales", "MLA · CVU · bank transfer", MELI_BLUE) +
+    kpi(f"{TOTAL_CASOS:,}".replace(",","."), "Casos totales", f"{FECHA_INICIO} al {FECHA_FIN}", MELI_BLUE) +
     kpi(f"{len(con_adjunto):,}".replace(",","."), "Con adjunto", f"{len(con_adjunto)/TOTAL_CASOS*100:.0f}% del total", MELI_GREEN) +
     kpi(str(len(denuncias)), "Denuncias policiales", f"{len(denuncias)/TOTAL_CASOS*100:.0f}% del total", MELI_ORANGE) +
     kpi(fmt_usd(total_monto), "Total reclamado", f"Mediana {fmt_usd(mediana)}", MELI_RED)
@@ -376,6 +514,8 @@ html = f"""<!DOCTYPE html>
     .ejemplo:last-child {{ margin-bottom:0; }}
     .ejemplo-id {{ font-size:11px; font-weight:700; color:#aaa; display:block; margin-bottom:4px; }}
     .ejemplo p {{ font-size:13px; color:#444; line-height:1.6; text-align:left; }}
+    .ejemplo ul {{ font-size:13px; color:#444; line-height:1.8; text-align:left; margin-top:4px; }}
+    .ejemplo li {{ margin-bottom:2px; }}
 
     /* Bancos */
     .card {{ background:#fff; border-radius:12px; padding:22px 24px;

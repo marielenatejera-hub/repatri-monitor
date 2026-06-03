@@ -69,6 +69,8 @@
     .ejemplo:last-child { margin-bottom:0; }
     .ejemplo-id { font-size:11px; font-weight:700; color:#aaa; display:block; margin-bottom:4px; }
     .ejemplo p { font-size:13px; color:#444; line-height:1.6; text-align:left; }
+    .ejemplo ul { font-size:13px; color:#444; line-height:1.8; text-align:left; margin-top:4px; }
+    .ejemplo li { margin-bottom:2px; }
 
     /* Bancos */
     .card { background:#fff; border-radius:12px; padding:22px 24px;
@@ -91,7 +93,7 @@
   <div class="header">
     <div>
       <h1>Clasificador de STO — MLA</h1>
-      <div class="sub">Bank Transfer · CVU · 2026-04-01 al 2026-04-30</div>
+      <div class="sub">Bank Transfer · CVU · 2026-05-03 al 2026-06-01</div>
     </div>
     <div class="header-right">
       Última actualización: <strong>03/06/2026</strong><br>
@@ -102,19 +104,19 @@
 
   <div class="kpi-row">
     <div class="kpi-card">
-      <div class="kpi-val" style="color:#3483FA">2.621</div>
+      <div class="kpi-val" style="color:#3483FA">2.311</div>
       <div class="kpi-lbl">Casos totales</div>
-      <div class="kpi-sub">MLA · CVU · bank transfer</div>
+      <div class="kpi-sub">2026-05-03 al 2026-06-01</div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-val" style="color:#00A650">183</div>
+      <div class="kpi-val" style="color:#00A650">808</div>
       <div class="kpi-lbl">Con adjunto</div>
-      <div class="kpi-sub">7% del total</div>
+      <div class="kpi-sub">35% del total</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-val" style="color:#FF7733">183</div>
       <div class="kpi-lbl">Denuncias policiales</div>
-      <div class="kpi-sub">7% del total</div>
+      <div class="kpi-sub">8% del total</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-val" style="color:#F23D4F">USD 320.462</div>
@@ -129,66 +131,75 @@
         <div class="section-title">Casos por tipo de fraude</div>
         <div class="hbar-chart">
     <div class="hbar-row">
-      <div class="hbar-label">📞 Llamada entrante del estafador</div>
+      <div class="hbar-label">💳 Préstamo fraudulento</div>
       <div class="hbar-wrap">
-        <div class="hbar-bar" style="width:15.0%;background:#3483FA">
-          <span class="hbar-val">20</span>
+        <div class="hbar-bar" style="width:100.0%;background:#F23D4F">
+          <span class="hbar-val">61</span>
         </div>
-        <span class="hbar-monto"> · USD 27.697</span>
+        <span class="hbar-monto"> · USD 69.674</span>
       </div>
     </div>
     <div class="hbar-row">
-      <div class="hbar-label">👤 Cuento del tío digital</div>
+      <div class="hbar-label">📞 Llamada entrante del estafador</div>
       <div class="hbar-wrap">
-        <div class="hbar-bar" style="width:11.3%;background:#333333">
-          <span class="hbar-val">15</span>
+        <div class="hbar-bar" style="width:59.0%;background:#3483FA">
+          <span class="hbar-val">36</span>
         </div>
-        <span class="hbar-monto"> · USD 56.305</span>
+        <span class="hbar-monto"> · USD 56.351</span>
       </div>
     </div>
     <div class="hbar-row">
       <div class="hbar-label">📱 Estafa en redes sociales</div>
       <div class="hbar-wrap">
-        <div class="hbar-bar" style="width:6.8%;background:#00A650">
-          <span class="hbar-val">9</span>
+        <div class="hbar-bar" style="width:49.2%;background:#00A650">
+          <span class="hbar-val">30</span>
         </div>
-        <span class="hbar-monto"> · USD 2.594</span>
-      </div>
-    </div>
-    <div class="hbar-row">
-      <div class="hbar-label">💳 Préstamo fraudulento</div>
-      <div class="hbar-wrap">
-        <div class="hbar-bar" style="width:3.8%;background:#F23D4F">
-          <span class="hbar-val">5</span>
-        </div>
-        <span class="hbar-monto"> · USD 6.499</span>
-      </div>
-    </div>
-    <div class="hbar-row">
-      <div class="hbar-label">📲 Acceso remoto (app instalada)</div>
-      <div class="hbar-wrap">
-        <div class="hbar-bar" style="width:0.8%;background:#FF7733">
-          <span class="hbar-val">1</span>
-        </div>
-        <span class="hbar-monto"></span>
+        <span class="hbar-monto"> · USD 103.383</span>
       </div>
     </div>
     <div class="hbar-row">
       <div class="hbar-label">🔍 Búsqueda activa de contacto</div>
       <div class="hbar-wrap">
-        <div class="hbar-bar" style="width:0.0%;background:#2968C8">
-          <span class="hbar-val">0</span>
+        <div class="hbar-bar" style="width:32.8%;background:#2968C8">
+          <span class="hbar-val">20</span>
         </div>
-        <span class="hbar-monto"></span>
+        <span class="hbar-monto"> · USD 30.582</span>
+      </div>
+    </div>
+    <div class="hbar-row">
+      <div class="hbar-label">👤 Cuento del tío digital</div>
+      <div class="hbar-wrap">
+        <div class="hbar-bar" style="width:31.1%;background:#333333">
+          <span class="hbar-val">19</span>
+        </div>
+        <span class="hbar-monto"> · USD 53.221</span>
+      </div>
+    </div>
+    <div class="hbar-row">
+      <div class="hbar-label">📵 Robo de dispositivo</div>
+      <div class="hbar-wrap">
+        <div class="hbar-bar" style="width:11.5%;background:#7F8C8D">
+          <span class="hbar-val">7</span>
+        </div>
+        <span class="hbar-monto"> · USD 253</span>
+      </div>
+    </div>
+    <div class="hbar-row">
+      <div class="hbar-label">📲 Acceso remoto (app instalada)</div>
+      <div class="hbar-wrap">
+        <div class="hbar-bar" style="width:8.2%;background:#FF7733">
+          <span class="hbar-val">5</span>
+        </div>
+        <span class="hbar-monto"> · USD 6.446</span>
       </div>
     </div>
     <div class="hbar-row">
       <div class="hbar-label">❓ No clasificado</div>
       <div class="hbar-wrap">
-        <div class="hbar-bar" style="width:100.0%;background:#CCCCCC">
-          <span class="hbar-val">133</span>
+        <div class="hbar-bar" style="width:6.6%;background:#CCCCCC">
+          <span class="hbar-val">4</span>
         </div>
-        <span class="hbar-monto"> · USD 227.367</span>
+        <span class="hbar-monto"></span>
       </div>
     </div></div>
       </div>
@@ -268,39 +279,39 @@
     <div class="section-title">Detalle por tipo de fraude — ordenados por monto reclamado</div>
     <div class="cat-grid">
     <div class="cat-card">
-      <div class="cat-header" style="background:#333333">
-        <div class="cat-emoji">👤</div>
-        <div class="cat-title" style="color:#fff">Cuento del tío digital</div>
-        <div class="cat-desc" style="color:#fff">Alguien se hace pasar por un familiar, amigo o conocido vía WhatsApp para solicitar dinero urgente con una excusa fabricada.</div>
+      <div class="cat-header" style="background:#F23D4F">
+        <div class="cat-emoji">💳</div>
+        <div class="cat-title" style="color:#fff">Préstamo fraudulento</div>
+        <div class="cat-desc" style="color:#fff">Los estafadores acceden a las cuentas de la víctima y solicitan préstamos a su nombre sin consentimiento, transfiriendo el dinero de inmediato.</div>
       </div>
       <div class="cat-body">
         <div class="cat-metrics">
           <div class="metric">
-            <div class="metric-val" style="color:#333333">15</div>
+            <div class="metric-val" style="color:#F23D4F">61</div>
             <div class="metric-lbl">Denuncias</div>
           </div>
           <div class="metric">
-            <div class="metric-val" style="color:#333333">USD 56.305</div>
+            <div class="metric-val" style="color:#F23D4F">USD 69.674</div>
             <div class="metric-lbl">Total reclamado</div>
           </div>
           <div class="metric">
-            <div class="metric-val" style="color:#333333">8%</div>
+            <div class="metric-val" style="color:#F23D4F">33%</div>
             <div class="metric-lbl">% denuncias</div>
           </div>
           <div class="metric">
-            <div class="metric-val" style="color:#333333">18%</div>
+            <div class="metric-val" style="color:#F23D4F">22%</div>
             <div class="metric-lbl">% monto total</div>
           </div>
         </div>
         <div class="ejemplos-title">Ejemplos reales</div>
         
         <div class="ejemplo">
-          <span class="ejemplo-id">Caso #2356437</span>
-          <p>José Ceferino Saa recibió una llamada de un desconocido que se identificó como su consuegro, alegando que se le había roto el auto y necesitaba asistencia de grúa urgente. Al comunicarse con el supuesto seguro, le exigieron un pago anticipado para enviar el servicio. Saa realizó la transferencia y luego verificó que su consuegro real se encontraba en su domicilio y desconocía completamente el hecho.</p>
+          <span class="ejemplo-id">Caso #2384607</span>
+          <div><ul style='margin:4px 0 0 16px;padding:0'><li><b>Resumen:</b> Detalle de múltiples transferencias de dinero presuntamente no autorizadas realizadas desde una cuenta de Mercado Pago hacia un tercero.</li><li><b>Montos:</b> $10.000 PESOS, $5.349 PESOS, $6419 PESOS, $5349 PESOS, $61419 PESOS, $4279 PESOS</li><li><b>Instituciones:</b> Mercado Pago</li></ul></div>
         </div>
         <div class="ejemplo">
-          <span class="ejemplo-id">Caso #2362902</span>
-          <p>Ester Lidia Fiore recibió mensajes de WhatsApp de alguien que se hizo pasar por su amiga María Teresa Cardenas, solicitando dinero de urgencia desde un número desconocido. Bajo ese engaño, realizó dos transferencias bancarias a nombre de una tercera persona antes de sospechar. Al llamar directamente a su amiga, confirmó que el teléfono había sido hackeado y que ella nunca había solicitado dinero.</p>
+          <span class="ejemplo-id">Caso #2384909</span>
+          <div><ul style='margin:4px 0 0 16px;padding:0'><li><b>Resumen:</b> Denuncia por múltiples transferencias bancarias no reconocidas desde cuentas de Tarjeta Naranja y Mercado Pago hacia distintos destinatarios.</li><li><b>Montos:</b> $10.000 PESOS, $10.000 PESOS, $15.000 PESOS, $10.000 PESOS, $5.349 PESOS, $6419 PESOS, $5349 PESOS, $5349 PESOS, $5349 PESOS, $61419 PESOS, $61419 PESOS, $4279 PESOS, $4279 PESOS, $6419 PESOS, $5349 PESOS, $3209 PESOS, $6740 PESOS, $4279, $5670 PESOS, $4279, $4279, $2888, $3423</li><li><b>Instituciones:</b> TARJETA NARANJA, MERCADO PAGO</li></ul></div>
         </div>
       </div>
     </div>
@@ -313,68 +324,31 @@
       <div class="cat-body">
         <div class="cat-metrics">
           <div class="metric">
-            <div class="metric-val" style="color:#3483FA">20</div>
+            <div class="metric-val" style="color:#3483FA">36</div>
             <div class="metric-lbl">Denuncias</div>
           </div>
           <div class="metric">
-            <div class="metric-val" style="color:#3483FA">USD 27.697</div>
+            <div class="metric-val" style="color:#3483FA">USD 56.351</div>
             <div class="metric-lbl">Total reclamado</div>
           </div>
           <div class="metric">
-            <div class="metric-val" style="color:#3483FA">11%</div>
+            <div class="metric-val" style="color:#3483FA">20%</div>
             <div class="metric-lbl">% denuncias</div>
           </div>
           <div class="metric">
-            <div class="metric-val" style="color:#3483FA">9%</div>
+            <div class="metric-val" style="color:#3483FA">18%</div>
             <div class="metric-lbl">% monto total</div>
           </div>
         </div>
         <div class="ejemplos-title">Ejemplos reales</div>
         
         <div class="ejemplo">
-          <span class="ejemplo-id">Caso #2350033</span>
-          <p>Silvina Paola Avila fue víctima de estafa telefónica. Un hombre se hizo pasar por cliente y contactó por WhatsApp para una supuesta compra. Le pidió datos bancarios y le envió un comprobante falso por un monto mayor al acordado, convenciéndola de devolver la diferencia mediante transferencias reales a cuentas de terceros.</p>
+          <span class="ejemplo-id">Caso #2385263</span>
+          <div><ul style='margin:4px 0 0 16px;padding:0'><li><b>Resumen:</b> La víctima fue engañada mediante un falso comprobante de transferencia por una venta en Marketplace, seguido de una llamada telefónica donde los estafadores se hicieron pasar por el banco para vaciar sus cuentas y tomar un préstamo a su nombre.</li><li><b>Montos:</b> $$200.000, $$100.000, $$1.000.000, $$900.000, $$5.486.250,00, $$548.000,00, $$48.000, $$500.000, $$60.503,87</li><li><b>Instituciones:</b> Facebook Marketplace, Banco Hipotecario, Banco de la Nación Argentina (BNA), Ualá, Tarjeta Naranja X, Claro Pay, Mercado Libre S.R.L.</li></ul></div>
         </div>
         <div class="ejemplo">
-          <span class="ejemplo-id">Caso #2344680</span>
-          <p>Claudia Mabel Polverigiani fue contactada telefónicamente por alguien que se hizo pasar por empleado de PAMI, tras haber ingresado sus datos en una publicidad falsa. La guiaron para instalar una aplicación en su teléfono y obtener credenciales de homebanking, vaciando sus cuentas y solicitando un préstamo a su nombre.</p>
-        </div>
-      </div>
-    </div>
-    <div class="cat-card">
-      <div class="cat-header" style="background:#F23D4F">
-        <div class="cat-emoji">💳</div>
-        <div class="cat-title" style="color:#fff">Préstamo fraudulento</div>
-        <div class="cat-desc" style="color:#fff">Los estafadores acceden a las cuentas de la víctima y solicitan préstamos a su nombre sin consentimiento, transfiriendo el dinero de inmediato.</div>
-      </div>
-      <div class="cat-body">
-        <div class="cat-metrics">
-          <div class="metric">
-            <div class="metric-val" style="color:#F23D4F">5</div>
-            <div class="metric-lbl">Denuncias</div>
-          </div>
-          <div class="metric">
-            <div class="metric-val" style="color:#F23D4F">USD 6.499</div>
-            <div class="metric-lbl">Total reclamado</div>
-          </div>
-          <div class="metric">
-            <div class="metric-val" style="color:#F23D4F">3%</div>
-            <div class="metric-lbl">% denuncias</div>
-          </div>
-          <div class="metric">
-            <div class="metric-val" style="color:#F23D4F">2%</div>
-            <div class="metric-lbl">% monto total</div>
-          </div>
-        </div>
-        <div class="ejemplos-title">Ejemplos reales</div>
-        
-        <div class="ejemplo">
-          <span class="ejemplo-id">Caso #2349747</span>
-          <p>La víctima publicó muebles en Facebook Marketplace. Un supuesto comprador envió comprobante falso alegando haber transferido un monto mayor por error. Estafadores que se hicieron pasar por personal del Banco Macro la guiaron para solicitar un préstamo y devolver la diferencia, transfiriendo los fondos a cuentas de terceros que ella desconocía.</p>
-        </div>
-        <div class="ejemplo">
-          <span class="ejemplo-id">Caso #2362412</span>
-          <p>María Susana Urbani buscó el número de Tarjeta Naranja en Google. Los estafadores obtuvieron sus datos biométricos mediante videollamada, ingresaron a su Home Banking y solicitaron un préstamo personal a su nombre sin consentimiento alguno, transfiriendo de inmediato la totalidad de los fondos obtenidos.</p>
+          <span class="ejemplo-id">Caso #2391429</span>
+          <div><ul style='margin:4px 0 0 16px;padding:0'><li><b>Resumen:</b> El denunciante recibió una llamada fraudulenta en nombre de PAMI para robarle sus datos personales, resultando en una transferencia bancaria no autorizada.</li><li><b>Montos:</b> $$126.000</li><li><b>Instituciones:</b> Poder Judicial de Córdoba, PAMI, Banco Nación</li></ul></div>
         </div>
       </div>
     </div>
@@ -387,31 +361,31 @@
       <div class="cat-body">
         <div class="cat-metrics">
           <div class="metric">
-            <div class="metric-val" style="color:#00A650">9</div>
+            <div class="metric-val" style="color:#00A650">30</div>
             <div class="metric-lbl">Denuncias</div>
           </div>
           <div class="metric">
-            <div class="metric-val" style="color:#00A650">USD 2.594</div>
+            <div class="metric-val" style="color:#00A650">USD 103.383</div>
             <div class="metric-lbl">Total reclamado</div>
           </div>
           <div class="metric">
-            <div class="metric-val" style="color:#00A650">5%</div>
+            <div class="metric-val" style="color:#00A650">16%</div>
             <div class="metric-lbl">% denuncias</div>
           </div>
           <div class="metric">
-            <div class="metric-val" style="color:#00A650">1%</div>
+            <div class="metric-val" style="color:#00A650">32%</div>
             <div class="metric-lbl">% monto total</div>
           </div>
         </div>
         <div class="ejemplos-title">Ejemplos reales</div>
         
         <div class="ejemplo">
-          <span class="ejemplo-id">Caso #2379686</span>
-          <p>Nadya Andrea Carauni contactó a la supuesta 'Academia de Negocios Vanguard Group' a través de un anuncio en redes sociales. Bajo instrucción de alguien identificado como 'Mariana López', fue inducida a depositar dinero en una billetera virtual para adquirir 'carteras de acciones', con promesa de altos rendimientos que nunca se materializaron y sin posibilidad de recuperar el capital invertido.</p>
+          <span class="ejemplo-id">Caso #2394640</span>
+          <div><ul style='margin:4px 0 0 16px;padding:0'><li><b>Resumen:</b> El denunciante transfirió dinero para alquilar una cuenta de trabajo en Pedidos Ya, pero luego le bloquearon el acceso y le pidieron más dinero.</li><li><b>Montos:</b> $$25.000,00</li><li><b>Instituciones:</b> Pedidos Ya, Mercado Pago, Tarjeta Naranja</li></ul></div>
         </div>
         <div class="ejemplo">
-          <span class="ejemplo-id">Caso #2350163</span>
-          <p>María Rosa Alaniz fue atraída por una publicidad falsa en Facebook que ofrecía computadoras gratuitas para jubilados. Al manifestar interés, recibió una llamada telefónica donde terceros la guiaron para acceder a su teléfono y cuentas bancarias, solicitando un préstamo a su nombre sin consentimiento y transfiriendo el dinero de forma inmediata.</p>
+          <span class="ejemplo-id">Caso #2410896</span>
+          <div><ul style='margin:4px 0 0 16px;padding:0'><li><b>Resumen:</b> El denunciante fue estafado al realizar múltiples pagos y transferencias para la compra de un vehículo que nunca le fue entregado, recibiendo amenazas posteriores.</li><li><b>Montos:</b> $$3.300.000, $$500.000, $$200.000, $$50.000</li><li><b>Instituciones:</b> Ministerio Público Fiscal Provincia de Mendoza, YPF, WhatsApp</li></ul></div>
         </div>
       </div>
     </div>
@@ -424,31 +398,105 @@
       <div class="cat-body">
         <div class="cat-metrics">
           <div class="metric">
-            <div class="metric-val" style="color:#2968C8">0</div>
+            <div class="metric-val" style="color:#2968C8">20</div>
             <div class="metric-lbl">Denuncias</div>
           </div>
           <div class="metric">
-            <div class="metric-val" style="color:#2968C8">USD 0</div>
+            <div class="metric-val" style="color:#2968C8">USD 30.582</div>
             <div class="metric-lbl">Total reclamado</div>
           </div>
           <div class="metric">
-            <div class="metric-val" style="color:#2968C8">0%</div>
+            <div class="metric-val" style="color:#2968C8">11%</div>
             <div class="metric-lbl">% denuncias</div>
           </div>
           <div class="metric">
-            <div class="metric-val" style="color:#2968C8">0%</div>
+            <div class="metric-val" style="color:#2968C8">10%</div>
             <div class="metric-lbl">% monto total</div>
           </div>
         </div>
         <div class="ejemplos-title">Ejemplos reales</div>
         
         <div class="ejemplo">
-          <span class="ejemplo-id">Caso #2372195</span>
-          <p>Juan Alberto Morales buscó en internet el número de atención de VISA tras notar una transferencia desconocida en su cuenta. Fue contactado por WhatsApp por un estafador que se presentó como representante de la empresa. Con la excusa de unificar cuentas y reintegrar el dinero, obtuvo sus credenciales bancarias y realizó múltiples transferencias no autorizadas.</p>
+          <span class="ejemplo-id">Caso #2389876</span>
+          <div><ul style='margin:4px 0 0 16px;padding:0'><li><b>Resumen:</b> El denunciante y su tío transfirieron dinero a una cuenta fraudulenta tras ser engañados por mensajes provenientes de un contacto de WhatsApp hackeado.</li><li><b>Montos:</b> $$ 920.000, $$ 5.000.000</li><li><b>Instituciones:</b> Mercado Pago, BNA</li></ul></div>
         </div>
         <div class="ejemplo">
-          <span class="ejemplo-id">Caso #2362412</span>
-          <p>María Susana Urbani buscó en Google el número de Tarjeta Naranja para consultar un problema. Los estafadores le solicitaron datos personales y realizaron una videollamada para fotografiar su rostro. Con esa información ingresaron a su Home Banking, sacaron un préstamo personal a su nombre y transfirieron la totalidad de los fondos.</p>
+          <span class="ejemplo-id">Caso #2405159</span>
+          <div><ul style='margin:4px 0 0 16px;padding:0'><li><b>Resumen:</b> La víctima fue engañada mediante una falsa promoción de Epec en Instagram y WhatsApp, llevándola a solicitar un crédito bancario y transferir los fondos a terceros bajo la falsa premisa de una simulación.</li><li><b>Montos:</b> $3 millones de pesos, $$24.000.000, $$3.960.866, $$5.600.000, $$4.671.000, $$3.000.000, $$2.200.167, $$19.432.033</li><li><b>Instituciones:</b> Epec, Banco Macro, Personal Pay, Mercado Pago</li></ul></div>
+        </div>
+      </div>
+    </div>
+    <div class="cat-card">
+      <div class="cat-header" style="background:#333333">
+        <div class="cat-emoji">👤</div>
+        <div class="cat-title" style="color:#fff">Cuento del tío digital</div>
+        <div class="cat-desc" style="color:#fff">Alguien se hace pasar por un familiar, amigo o conocido vía WhatsApp para solicitar dinero urgente con una excusa fabricada.</div>
+      </div>
+      <div class="cat-body">
+        <div class="cat-metrics">
+          <div class="metric">
+            <div class="metric-val" style="color:#333333">19</div>
+            <div class="metric-lbl">Denuncias</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#333333">USD 53.221</div>
+            <div class="metric-lbl">Total reclamado</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#333333">10%</div>
+            <div class="metric-lbl">% denuncias</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#333333">17%</div>
+            <div class="metric-lbl">% monto total</div>
+          </div>
+        </div>
+        <div class="ejemplos-title">Ejemplos reales</div>
+        
+        <div class="ejemplo">
+          <span class="ejemplo-id">Caso #2398535</span>
+          <div><ul style='margin:4px 0 0 16px;padding:0'><li><b>Resumen:</b> El denunciante realizó múltiples transferencias de dinero a un supuesto médico espiritual para curar a su novia, dándose cuenta luego de que era una estafa.</li><li><b>Montos:</b> $220.000,00, $40.000, $20.000, $10.000, $50.000, $100.000,00</li><li><b>Instituciones:</b> Ministerio Público de la Acusación Provincia de Jujuy, Agencia Provincial de Delitos Complejos, Tarjeta Naranja</li></ul></div>
+        </div>
+        <div class="ejemplo">
+          <span class="ejemplo-id">Caso #2398532</span>
+          <div><ul style='margin:4px 0 0 16px;padding:0'><li><b>Resumen:</b> El denunciante fue engañado para realizar múltiples transferencias de dinero a un falso médico espiritual que prometía curar a su pareja.</li><li><b>Montos:</b> $$220.000,00, $$40.000, $$20.000, $$10.000, $$50.000, $$100.000,00</li><li><b>Instituciones:</b> Tarjeta Naranja, Ministerio Público de la Acusación Provincia de Jujuy, Agencia Provincial de Delitos Complejos</li></ul></div>
+        </div>
+      </div>
+    </div>
+    <div class="cat-card">
+      <div class="cat-header" style="background:#7F8C8D">
+        <div class="cat-emoji">📵</div>
+        <div class="cat-title" style="color:#fff">Robo de dispositivo</div>
+        <div class="cat-desc" style="color:#fff">El fraude ocurre tras el robo o hurto del celular de la víctima, aprovechando el acceso físico para realizar transferencias no autorizadas.</div>
+      </div>
+      <div class="cat-body">
+        <div class="cat-metrics">
+          <div class="metric">
+            <div class="metric-val" style="color:#7F8C8D">7</div>
+            <div class="metric-lbl">Denuncias</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#7F8C8D">USD 253</div>
+            <div class="metric-lbl">Total reclamado</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#7F8C8D">4%</div>
+            <div class="metric-lbl">% denuncias</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#7F8C8D">0%</div>
+            <div class="metric-lbl">% monto total</div>
+          </div>
+        </div>
+        <div class="ejemplos-title">Ejemplos reales</div>
+        
+        <div class="ejemplo">
+          <span class="ejemplo-id">Caso #2389437</span>
+          <div><ul style='margin:4px 0 0 16px;padding:0'><li><b>Resumen:</b> El denunciante fue engañado por dos mujeres que conoció en un bar y posteriormente asaltado por un cómplice en un vehículo, quien le sustrajo su teléfono celular bajo amenaza con un destornillador.</li><li><b>Instituciones:</b> Policía de la Ciudad de Buenos Aires, Ministerio Público Fiscal, Tuenti</li></ul></div>
+        </div>
+        <div class="ejemplo">
+          <span class="ejemplo-id">Caso #2391587</span>
+          <div><ul style='margin:4px 0 0 16px;padding:0'><li><b>Resumen:</b> El denunciante sufrió el robo de sus pertenencias, incluyendo su celular y tarjetas, y posteriormente detectó una transferencia fraudulenta desde su cuenta.</li><li><b>Montos:</b> $$60.000, $20.000, $10.000, $$220.000</li><li><b>Instituciones:</b> Poder Judicial de Córdoba, Ministerio Público Fiscal, Didi, Claro, Naranja, Banco Nación</li></ul></div>
         </div>
       </div>
     </div>
@@ -461,31 +509,64 @@
       <div class="cat-body">
         <div class="cat-metrics">
           <div class="metric">
-            <div class="metric-val" style="color:#FF7733">1</div>
+            <div class="metric-val" style="color:#FF7733">5</div>
             <div class="metric-lbl">Denuncias</div>
           </div>
           <div class="metric">
-            <div class="metric-val" style="color:#FF7733">USD 0</div>
+            <div class="metric-val" style="color:#FF7733">USD 6.446</div>
             <div class="metric-lbl">Total reclamado</div>
           </div>
           <div class="metric">
-            <div class="metric-val" style="color:#FF7733">1%</div>
+            <div class="metric-val" style="color:#FF7733">3%</div>
             <div class="metric-lbl">% denuncias</div>
           </div>
           <div class="metric">
-            <div class="metric-val" style="color:#FF7733">0%</div>
+            <div class="metric-val" style="color:#FF7733">2%</div>
             <div class="metric-lbl">% monto total</div>
           </div>
         </div>
         <div class="ejemplos-title">Ejemplos reales</div>
         
         <div class="ejemplo">
-          <span class="ejemplo-id">Caso #2371331</span>
-          <p>Marta Yolanda Maidana intentó descargar un recibo en una página falsa del IPS y dejó su número de contacto. Fue contactada por WhatsApp y durante una videollamada la indujeron a compartir pantalla y descargar 'SUPREMO MOBILE'. Los estafadores tomaron control total de su dispositivo, robaron credenciales de homebanking, solicitaron préstamos a su nombre y vaciaron todas sus cuentas.</p>
+          <span class="ejemplo-id">Caso #2388697</span>
+          <div><ul style='margin:4px 0 0 16px;padding:0'><li><b>Resumen:</b> La víctima denuncia un fraude informático tras detectar movimientos no autorizados en su cuenta bancaria.</li><li><b>Montos:</b> $2,991.56, $377,871.38, $6,800.00, $5,000.00, $3,490.00, $20,000.00, $1,698,997.13, $100,000.00, $30,000.00, $33,000.00, $7,000.00, $36,000.00, $11,261.00, $1,600.00, $7.18, $20,909.09, $4,390.91, $1,000,000.00, $130.00</li><li><b>Instituciones:</b> Policía de la Provincia de Buenos Aires, Ministerio Público Fiscal, Banco Supervielle, ANSES, Brubank S.A.U.</li></ul></div>
         </div>
         <div class="ejemplo">
-          <span class="ejemplo-id">Caso #2366252</span>
-          <p>La víctima recibió una llamada de WhatsApp de alguien que se presentó como empleado de Movistar ofreciendo beneficios para jubilados. La convencieron de descargar ULTRA VNC mediante un enlace enviado por el mismo canal. Una vez instalada la app, los estafadores tomaron control remoto del teléfono y realizaron múltiples transferencias bancarias sin su consentimiento.</p>
+          <span class="ejemplo-id">Caso #2424427</span>
+          <div><ul style='margin:4px 0 0 16px;padding:0'><li><b>Resumen:</b> El denunciante reporta el ingreso no autorizado a su cuenta bancaria, la acreditación de un préstamo y la posterior sustracción de fondos mediante 34 transferencias fraudulentas.</li><li><b>Montos:</b> $$10.600.000, $$4.887.970</li><li><b>Instituciones:</b> Policía de la Provincia de Tierra del Fuego, Juzgado de Instrucción N° 2 del Distrito Judicial Norte, Banco Nación</li></ul></div>
+        </div>
+      </div>
+    </div>
+    <div class="cat-card">
+      <div class="cat-header" style="background:#7F8C8D">
+        <div class="cat-emoji">🔎</div>
+        <div class="cat-title" style="color:#fff">compra fraudulenta whatsapp</div>
+        <div class="cat-desc" style="color:#fff">Categoría detectada automáticamente por IA</div>
+      </div>
+      <div class="cat-body">
+        <div class="cat-metrics">
+          <div class="metric">
+            <div class="metric-val" style="color:#7F8C8D">1</div>
+            <div class="metric-lbl">Denuncias</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#7F8C8D">USD 551</div>
+            <div class="metric-lbl">Total reclamado</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#7F8C8D">1%</div>
+            <div class="metric-lbl">% denuncias</div>
+          </div>
+          <div class="metric">
+            <div class="metric-val" style="color:#7F8C8D">0%</div>
+            <div class="metric-lbl">% monto total</div>
+          </div>
+        </div>
+        <div class="ejemplos-title">Ejemplos reales</div>
+        
+        <div class="ejemplo">
+          <span class="ejemplo-id">Caso #2409599</span>
+          <div><ul style='margin:4px 0 0 16px;padding:0'><li><b>Resumen:</b> El denunciante fue estafado tras realizar múltiples transferencias de dinero por la compra de repuestos de automotor a través de WhatsApp a dos supuestos comercios que nunca entregaron la mercadería.</li><li><b>Montos:</b> $$190.000, $$120.000, $$25.000, $$300.000, $$150.000</li><li><b>Instituciones:</b> Mercado Libre SRL, Banco Nación, Policía Comunal San Cayetano</li></ul></div>
         </div>
       </div>
     </div></div>
