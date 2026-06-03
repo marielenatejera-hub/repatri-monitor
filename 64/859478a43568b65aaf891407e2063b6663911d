@@ -1,0 +1,19 @@
+src/monitor.py
+  s_c33484effb4a4e::t_e20c9277586653 316,319-326
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "64859478a43568b65aaf891407e2063b6663911d",
+  "prompts": {},
+  "sessions": {
+    "s_c33484effb4a4e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cdda7b70-5f21-4a2e-92ab-4bd64a09a285",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Marielena Perez <marielena.tejera@mercadolibre.com>"
+    }
+  }
+}
