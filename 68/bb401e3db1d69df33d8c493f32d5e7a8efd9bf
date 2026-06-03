@@ -1,0 +1,33 @@
+src/reporte.py
+  s_c33484effb4a4e::t_f435c990102536 333,335-336
+  s_c33484effb4a4e::t_83fae4fe16c8f8 5
+  s_c33484effb4a4e::t_ce4b6cf048c955 164-165,170,174-177,179-181,185,188-191,196
+  s_c33484effb4a4e::t_02a8d9f52144b9 259-290,302
+  s_c33484effb4a4e::t_3629b5307a2b6a 349,351
+  s_c33484effb4a4e::t_14e4a579cb08b3 156-163,166-169,171-173,178,182-184,186-187,192-195,197-212
+  s_c33484effb4a4e::t_444b561911dfb2 227-234,241,312-313,317-318,320-323
+  s_c33484effb4a4e::t_a84aa32a47dd32 242-247
+  s_c33484effb4a4e::t_15d45fc0e607a9 438
+  s_c33484effb4a4e::t_f3b941b831fb6f 258,291-301,303-311,314,319
+  s_c33484effb4a4e::t_297de7fc4fa2e9 343
+  s_c33484effb4a4e::t_6c27d8ff067ee8 29-32
+  s_c33484effb4a4e::t_f8a632a9af8ce3 339
+  s_c33484effb4a4e::t_eeab47d38a4cb2 110-116
+  s_c33484effb4a4e::t_e9f00a42239d0e 517-518
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "68bb401e3db1d69df33d8c493f32d5e7a8efd9bf",
+  "prompts": {},
+  "sessions": {
+    "s_c33484effb4a4e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cdda7b70-5f21-4a2e-92ab-4bd64a09a285",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "Marielena Perez <marielena.tejera@mercadolibre.com>"
+    }
+  }
+}
